@@ -5,15 +5,25 @@
     <canvas></canvas>
   </body>
   <script id="vertex-shader-2d" type="notjs">
-    // an attribute will receive data from a buffer
-    attribute vec4 a_position;
+    // so now we're assuming this is pixel position on screen
+    attribute vec2 a_position;
+
+    uniform vec2 u_resolution;
 
     // all shaders have a main function
     void main() {
 
-      // gl_Position is a special variable that a vertex shader
-      // is responsible for setting
-      gl_Position = a_position;
+      // convert the position from pixels to 0.0 -> 1.0
+      // oo vector math
+      vec2 zeroToOne = a_position / u_resolution;
+
+      // convert from 0 -> 1 to 0->2
+      vec2 zeroToTwo = zeroToOne * 2.0;
+
+      // convert to clip space (-1->1)
+      vec2 clipSpace = zeroToTwo - 1.0;
+      
+      gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
     }
   </script>
   <script id="fragment-shader-2d" type="notjs">
@@ -21,11 +31,11 @@
     // pick one. mediump is a good default
     precision mediump float;
 
+    uniform vec4 u_color;
+
     void main() {
 
-      // gl_FragColor is a special variable a fragment shader is
-      // responsible for setting
-      gl_FragColor = vec4(0, 1, 1, 1); // return cyan
+      gl_FragColor = u_color;
     }
   </script>
   <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
