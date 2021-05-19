@@ -1,9 +1,4 @@
 
-function hello() {
-  console.log('hellow rold');
-}
-hello();
-
 const canvas = document.querySelector('canvas');
 
 const gl = canvas.getContext('webgl');
@@ -65,6 +60,8 @@ var program = createProgram(gl, vertexShader, fragmentShader);
 
 
 var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
+var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
 
 var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
 
