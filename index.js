@@ -1,4 +1,6 @@
 
+import art from "url:./dude.png";
+
 const canvas = document.querySelector('canvas');
 
 const gl = canvas.getContext('webgl');
@@ -57,7 +59,6 @@ console.log(fragmentShader);
 
 // create program and link shaders into program
 var program = createProgram(gl, vertexShader, fragmentShader);
-
 
 var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
@@ -131,25 +132,29 @@ var offset = 0;
 var count = 6;
 gl.drawArrays(primitiveType, offset, count);
 
+
 // draw 50 random rects
-for (var ii = 0; ii < 50; ++ii) {
-    // Setup a random rectangle
-    // This will write to positionBuffer because
-    // its the last thing we bound on the ARRAY_BUFFER
-    // bind point
-    setRectangle(
-        gl, randomInt(300), randomInt(300), randomInt(300), randomInt(300));
+function drawRandomRects() {
 
-    // Set a random color.
-    gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
-
-    // Draw the rectangle.
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-}
-
-// Returns a random integer from 0 to range - 1.
-function randomInt(range) {
-  return Math.floor(Math.random() * range);
+  for (var ii = 0; ii < 50; ++ii) {
+      // Setup a random rectangle
+      // This will write to positionBuffer because
+      // its the last thing we bound on the ARRAY_BUFFER
+      // bind point
+      setRectangle(
+          gl, randomInt(300), randomInt(300), randomInt(300), randomInt(300));
+  
+      // Set a random color.
+      gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
+  
+      // Draw the rectangle.
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+  }
+  
+  // Returns a random integer from 0 to range - 1.
+  function randomInt(range) {
+    return Math.floor(Math.random() * range);
+  }
 }
 
 // Fills the buffer with the values that define a rectangle.
@@ -173,3 +178,44 @@ function setRectangle(gl, x, y, width, height) {
      x2, y2]), gl.STATIC_DRAW);
 }
 
+function main() {
+  var img = new Image();
+  console.log(art);
+  img.src = art;
+  img.onload = function() {
+    console.log('lololol');
+    render(img);
+  }
+}
+
+function render(img) {
+  var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
+
+  var texCoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      0.0,  0.0,
+      1.0,  0.0,
+      0.0,  1.0,
+      0.0,  1.0,
+      1.0,  0.0,
+      1.0,  1.0]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(texCoordLocation);
+  gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+  // Create a texture.
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Set the parameters so we can render any size image.
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+  // Upload the image into the texture.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+
+}
+
+main();
