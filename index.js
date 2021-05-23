@@ -1,5 +1,5 @@
 
-import art from "url:./dude.png";
+import art from "./dude.png";
 
 const canvas = document.querySelector('canvas');
 
@@ -98,7 +98,6 @@ gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 gl.clearColor(0, 0, 0, 0);
 
-// tf does this line do?
 gl.clear(gl.COLOR_BUFFER_BIT);
 
 // tell webgl to use the program (that's on the GPU)
@@ -130,7 +129,7 @@ gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 var primitiveType = gl.TRIANGLES;
 var offset = 0;
 var count = 6;
-gl.drawArrays(primitiveType, offset, count);
+// gl.drawArrays(primitiveType, offset, count);
 
 
 // draw 50 random rects
@@ -183,7 +182,6 @@ function main() {
   console.log(art);
   img.src = art;
   img.onload = function() {
-    console.log('lololol');
     render(img);
   }
 }
@@ -215,6 +213,13 @@ function render(img) {
 
   // Upload the image into the texture.
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+
+  // DRAW DRAW DRAW draw!
+  var primitiveType = gl.TRIANGLES;
+  var offset = 0;
+  var count = 6;
+  gl.drawArrays(primitiveType, offset, count);
+
 
 }
 
