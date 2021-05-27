@@ -60,35 +60,9 @@ console.log(fragmentShader);
 // create program and link shaders into program
 var program = createProgram(gl, vertexShader, fragmentShader);
 
-var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-
-var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
+// ============ END PROGRAM CREATION/LINKING ===============
 
 var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-
-var colorUniformLocation = gl.getUniformLocation(program, "u_color");
-
-// make a buffer - we will use this to provide the data for a_position
-// it's like a little tray that we put ingredients in and then
-// webgl takes those ingredients and makes cake with it
-var positionBuffer = gl.createBuffer();
-
-// bind the buffer to gl
-// still not really sure what this does
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-
-var positions = [
-  10, 20,
-  80, 20,
-  10, 30,
-  10, 30,
-  80, 20,
-  80, 30,
-];
-
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
 
 // BEGIN RENDER LOOP?
 webglUtils.resizeCanvasToDisplaySize(gl.canvas);
@@ -103,90 +77,59 @@ gl.clear(gl.COLOR_BUFFER_BIT);
 // tell webgl to use the program (that's on the GPU)
 gl.useProgram(program);
 
-gl.enableVertexAttribArray(positionAttributeLocation);
-
-// Bind the position buffer.
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-var size = 2;          // 2 components per iteration
-var type = gl.FLOAT;   // the data is 32bit floats
-var normalize = false; // don't normalize the data
-var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-var offset = 0;        // start at the beginning of the buffer
-
-// it binds it to the current ARRAY_BUFFER (not made explicit)
-// so now the position attrib is bound to positionBuffer (the current ARRAY_BUFFER)
-// and now that we've done this, we can bind something esle to
-// ARRAY_BUFFER and use it for something else
-gl.vertexAttribPointer(
-    positionAttributeLocation, size, type, normalize, stride, offset)
-
 // sets this uniform on the last program that we called useProgram on
 gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
-// DRAW DRAW DRAW draw!
-var primitiveType = gl.TRIANGLES;
-var offset = 0;
-var count = 6;
+
+
 // gl.drawArrays(primitiveType, offset, count);
+// assume a square sprite 32x32
+// assume that we've loaded and linked the appropriate frag and vert
+// shaders into a program and into gl
+function drawSprite(img, x, y, scale) {
 
 
-// draw 50 random rects
-function drawRandomRects() {
+  // CONSTRUCT VERTICES FOR SQUARE AND LOAD THEM INTO THE PROGRAM
 
-  for (var ii = 0; ii < 50; ++ii) {
-      // Setup a random rectangle
-      // This will write to positionBuffer because
-      // its the last thing we bound on the ARRAY_BUFFER
-      // bind point
-      setRectangle(
-          gl, randomInt(300), randomInt(300), randomInt(300), randomInt(300));
+  var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   
-      // Set a random color.
-      gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
+
+  // construct array for triangle vertices
+  // two triangles that form into a square of size 32*<scale>
+  // top-left of triangle is at (x,y) in pixel space
   
-      // Draw the rectangle.
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-  }
+  var positions = [
+    x, y, // top left
+    x + 32, y, // top right
+    x, y + 32, // bottom left 
+    x, y + 32, // bottom left
+    x + 32, y, // top right
+    x + 32, y + 32, // bottom right
+  ];
   
-  // Returns a random integer from 0 to range - 1.
-  function randomInt(range) {
-    return Math.floor(Math.random() * range);
-  }
-}
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  
+  gl.enableVertexAttribArray(positionAttributeLocation);
 
-// Fills the buffer with the values that define a rectangle.
-function setRectangle(gl, x, y, width, height) {
-  var x1 = x;
-  var x2 = x + width;
-  var y1 = y;
-  var y2 = y + height;
+  // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+  var size = 2;          // 2 components per iteration
+  var type = gl.FLOAT;   // the data is 32bit floats
+  var normalize = false; // don't normalize the data
+  var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+  var offset = 0;        // start at the beginning of the buffer
+  
+  // it binds it to the current ARRAY_BUFFER (not made explicit)
+  // so now the position attrib is bound to positionBuffer (the current ARRAY_BUFFER)
+  // and now that we've done this, we can bind something esle to
+  // ARRAY_BUFFER and use it for something else
+  gl.vertexAttribPointer(
+      positionAttributeLocation, size, type, normalize, stride, offset)
 
-  // NOTE: gl.bufferData(gl.ARRAY_BUFFER, ...) will affect
-  // whatever buffer is bound to the `ARRAY_BUFFER` bind point
-  // but so far we only have one buffer. If we had more than one
-  // buffer we'd want to bind that buffer to `ARRAY_BUFFER` first.
 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-     x1, y1,
-     x2, y1,
-     x1, y2,
-     x1, y2,
-     x2, y1,
-     x2, y2]), gl.STATIC_DRAW);
-}
+  // PREP TEXTURE THAT WILL BE PAINTED ONTO THE SQUARE
 
-function main() {
-  var img = new Image();
-  console.log(art);
-  img.src = art;
-  img.onload = function() {
-    render(img);
-  }
-}
-
-function render(img) {
   var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
 
   var texCoordBuffer = gl.createBuffer();
@@ -214,12 +157,27 @@ function render(img) {
   // Upload the image into the texture.
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 
-  // DRAW DRAW DRAW draw!
+
+  // draw the texture onto the triangle
   var primitiveType = gl.TRIANGLES;
   var offset = 0;
   var count = 6;
   gl.drawArrays(primitiveType, offset, count);
 
+}
+
+function main() {
+  var img = new Image();
+  console.log(art);
+  img.src = art;
+  img.onload = function() {
+    render(img);
+  }
+}
+
+function render(img) {
+  drawSprite(img, 10, 20, 1);
+  drawSprite(img, 50, 60, 1);
 
 }
 
