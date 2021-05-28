@@ -1,5 +1,5 @@
 
-import art from "./dude.png";
+import char from "./assets/char.png";
 
 const canvas = document.querySelector('canvas');
 
@@ -168,8 +168,8 @@ function drawSprite(img, x, y, scale) {
 
 function main() {
   var img = new Image();
-  console.log(art);
-  img.src = art;
+  console.log(char);
+  img.src = char;
   img.onload = function() {
     render(img);
   }
