@@ -61,21 +61,12 @@ console.log(fragmentShader);
 var program = createProgram(gl, vertexShader, fragmentShader);
 
 // ============ END PROGRAM CREATION/LINKING ===============
+// tell webgl to use the program (that's on the GPU)
+gl.useProgram(program);
 
 var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
 
-// BEGIN RENDER LOOP?
-webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
-// maps clip space onto the whole canvas (and no bigger)
-gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-gl.clearColor(0, 0, 0, 0);
-
-gl.clear(gl.COLOR_BUFFER_BIT);
-
-// tell webgl to use the program (that's on the GPU)
-gl.useProgram(program);
 
 // sets this uniform on the last program that we called useProgram on
 gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
@@ -176,6 +167,17 @@ function main() {
 }
 
 function render(img) {
+
+  // BEGIN RENDER LOOP?
+  webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+  
+  // maps clip space onto the whole canvas (and no bigger)
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  
+  gl.clearColor(0, 0, 0, 0);
+  
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
   drawSprite(img, 10, 20, 1);
   drawSprite(img, 50, 60, 1);
 
