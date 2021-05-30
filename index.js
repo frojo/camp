@@ -1,5 +1,6 @@
 
-import char from "./assets/char.png";
+import charSheet from "./assets/char.png";
+import charMeta from "./assets/char.json";
 
 const canvas = document.querySelector('canvas');
 
@@ -157,18 +158,62 @@ function drawSprite(img, x, y, scale) {
 
 }
 
-function main() {
-  var img = new Image();
-  console.log(char);
-  img.src = char;
-  img.onload = function() {
-    render(img);
+class Char {
+
+  // <sheet> is a path to a spritesheet .png
+  // <meta> is a path to a .json containing animation metadata
+  constructor(sheet, meta) {
+    this.sheet = sheet;
+    this.meta = meta;
+
+
+    // load the image
+    let img = new Image();
+    img.src = sheet;
+
+
+    this.loaded = false;
+    img.onload = function() {
+      this.loaded = true;
+    }
+
+    this.img = img;
+
+
+
+  }
+
+  draw(gl, anim) {
+    console.log(this.meta.frames[1]);
   }
 }
 
-function render(img) {
+var img;
+var char;
+function main() {
 
-  // BEGIN RENDER LOOP?
+  char = new Char(charSheet, charMeta);
+
+  requestAnimationFrame(drawFrame);
+
+}
+
+function render(img) {
+  drawSprite(img, 10, 20, 1);
+}
+
+main();
+
+var then = 0;
+
+requestAnimationFrame(drawFrame);
+
+// this is the main render func
+function drawFrame(now) {
+  // variable framerate
+  let delta = now - then;
+  then = now;
+
   webglUtils.resizeCanvasToDisplaySize(gl.canvas);
   
   // maps clip space onto the whole canvas (and no bigger)
@@ -178,9 +223,9 @@ function render(img) {
   
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  drawSprite(img, 10, 20, 1);
-  drawSprite(img, 50, 60, 1);
+  //render(img);
 
+  char.draw(gl, "walk");
+
+  requestAnimationFrame(drawFrame);
 }
-
-main();
