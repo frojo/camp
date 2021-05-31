@@ -172,6 +172,14 @@ function drawSprite(img, x, y, scale) {
 
 class Char {
 
+
+  // we're assuming the sheet is a horizontal row of sprites
+  // and it comes with a json file that has info on where the animations
+  // start and end
+  //
+  // this is exported by aseprite with fran's export settings that 
+  // he likes so that this all works
+
   // <sheet> is a path to a spritesheet .png
   // <meta> is a path to a .json containing animation metadata
   constructor(sheet, meta) {
@@ -191,11 +199,42 @@ class Char {
 
     this.img = img;
 
-
+    // by default, just "animate" based on the first sprite in the sheet
+    this.curr_i = 0;
+    this.start_i = 0;
+    this.end_i = 0;
 
   }
 
-  draw(gl, anim) {
+  // anim is a string that is an id for the anim e.g. "walk"
+  startAnim(anim) {
+    //console.log(this.meta.meta.frameTags);
+    let tags = this.meta.meta.frameTags;
+
+    const anim_info = tags.find(function(value) {
+      return value.name == anim;
+    });
+
+    console.log(anim_info);
+    this.start_i = anim_info.from;
+    this.end_i = anim_info.to;
+  }
+
+  // <sheet> is a the spritesheet .png
+  // <i> is the index of the sprite in the sheet
+  drawFrameFromSheet(sheet, i, x, y) {
+
+    // make a texture sampler matrix based on i
+
+
+    drawSprite(this.img, 100, 40, 1);
+  }
+
+  draw(gl) {
+
+    // assume for now that every frame lasts for .5 seconds
+    
+
     drawSprite(this.img, 100, 40, 1);
   }
 }
@@ -206,12 +245,10 @@ function main() {
 
   char = new Char(charSheet, charMeta);
 
+  char.startAnim('walk');
+
   requestAnimationFrame(drawFrame);
 
-}
-
-function render(img) {
-  drawSprite(img, 10, 20, 1);
 }
 
 main();
@@ -234,8 +271,6 @@ function drawFrame(now) {
   gl.clearColor(0, 0, 0, 0);
   
   gl.clear(gl.COLOR_BUFFER_BIT);
-
-  //render(img);
 
   char.draw(gl, "walk");
 
