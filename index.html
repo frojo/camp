@@ -23,13 +23,16 @@
     varying vec2 v_texCoord;
 
     uniform vec2 u_resolution;
+    uniform vec2 u_translation;
 
     // all shaders have a main function
     void main() {
 
+      vec2 position = a_position + u_translation;
+
       // convert the position from pixels to 0.0 -> 1.0
       // oo vector math
-      vec2 zeroToOne = a_position / u_resolution;
+      vec2 zeroToOne = position / u_resolution;
 
       // convert from 0 -> 1 to 0->2
       vec2 zeroToTwo = zeroToOne * 2.0;
@@ -40,7 +43,7 @@
       // flip y-axis so that (0,0) is in top right
       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
 
-      v_texCoord = a_texCoord;
+      v_texCoord = a_texCoord / vec2(3.0, 1.0);
     }
   </script>
   <script id="fragment-shader-2d" type="notjs">

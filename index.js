@@ -89,16 +89,16 @@ function drawSprite(img, x, y, scale) {
   
 
   // construct array for triangle vertices
-  // two triangles that form into a square of size 32*<scale>
+  // two triangles that form into a square of size 32x32
   // top-left of triangle is at (x,y) in pixel space
   
   var positions = [
-    x, y, // top left
-    x + 32, y, // top right
-    x, y + 32, // bottom left 
-    x, y + 32, // bottom left
-    x + 32, y, // top right
-    x + 32, y + 32, // bottom right
+    0, 0, // top left
+    32, 0, // top right
+    0,  32, // bottom left 
+    0, 32, // bottom left
+    32, 0, // top right
+    32, 32, // bottom right
   ];
   
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -118,6 +118,18 @@ function drawSprite(img, x, y, scale) {
   // ARRAY_BUFFER and use it for something else
   gl.vertexAttribPointer(
       positionAttributeLocation, size, type, normalize, stride, offset)
+
+  // translation coords
+  var translationUniformLocation = gl.getUniformLocation(program, "u_translation");
+  
+  gl.uniform2f(translationUniformLocation, x, y);
+  
+  // rotation params (i'm not even using them bc fuck that rn lol)
+  var rotationUniformLocation = gl.getUniformLocation(program, "u_rotation");
+  
+  gl.uniform2f(rotationUniformLocation, x, y);
+  
+
 
 
   // PREP TEXTURE THAT WILL BE PAINTED ONTO THE SQUARE
@@ -184,7 +196,7 @@ class Char {
   }
 
   draw(gl, anim) {
-    console.log(this.meta.frames[1]);
+    drawSprite(this.img, 100, 40, 1);
   }
 }
 
