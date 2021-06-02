@@ -2,6 +2,10 @@
 import charSheet from "./assets/char.png";
 import charMeta from "./assets/char.json";
 
+import * as TWGL  from "twgl.js";
+let m3 = TWGL.m3;
+let m4 = TWGL.m4;
+
 const canvas = document.querySelector('canvas');
 
 const gl = canvas.getContext('webgl');
@@ -129,6 +133,19 @@ function drawSprite(img, x, y, scale) {
   
   gl.uniform2f(rotationUniformLocation, x, y);
   
+  // console.log(TWGL);
+  // console.log(TWGL.m3);
+  // console.log(m3);
+
+  // // pass in the transform matrix as a uniform
+  // var matrixLocation = gl.getUniformLocation(program, "u_transform");
+  // let transform = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight);
+  // transform = m4.translate(matrix, x, y);
+  // transform = m4.rotate(matrix, 0);
+  // transform = m4.scale(matrix, 1, 1);
+  // gl.uniformMatrix4fv(matrixLocation, false, matrix);// Set the matrix.
+  
+
 
 
 
@@ -232,7 +249,20 @@ class Char {
 
   draw(gl) {
 
+    // determine which frame we're on
+    const t_ms = Date.now();
+    const num_frames = this.end_i - this.start_i + 1;
+
     // assume for now that every frame lasts for .5 seconds
+    const frame_dur = 500;
+
+    const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
+    const frame_i = this.start_i + curr_frame;
+    
+
+    console.log(curr_frame);
+
+    this.drawFrameFromSheet(this.sheet, frame_i, 140, 40);
     
 
     drawSprite(this.img, 100, 40, 1);
