@@ -11,7 +11,7 @@
   
   </head>
   <body>
-    hello world
+    <p>:)</p>
     <canvas id="world"></canvas>
   </body>
   <script id="vertex-shader-2d" type="notjs">
@@ -25,6 +25,10 @@
     uniform vec2 u_resolution;
     uniform vec2 u_translation;
     uniform mat3 u_transform;
+
+    // we just need a scale and translate bc we know the sheet is horizontal
+    uniform float u_sheetScale;
+    uniform float u_sheetTranslate;
 
     // all shaders have a main function
     void main() {
@@ -44,7 +48,8 @@
       // flip y-axis so that (0,0) is in top right
       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
 
-      v_texCoord = a_texCoord / vec2(3.0, 1.0);
+      vec2 texCoordTranslated = a_texCoord + vec2(u_sheetTranslate, 0.0);
+      v_texCoord = texCoordTranslated / vec2(u_sheetScale, 1.0);
     }
   </script>
   <script id="fragment-shader-2d" type="notjs">

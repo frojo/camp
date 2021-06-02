@@ -3,7 +3,6 @@ import charSheet from "./assets/char.png";
 import charMeta from "./assets/char.json";
 
 import * as TWGL  from "twgl.js";
-let m3 = TWGL.m3;
 let m4 = TWGL.m4;
 
 const canvas = document.querySelector('canvas');
@@ -82,7 +81,7 @@ gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 // assume a square sprite 32x32
 // assume that we've loaded and linked the appropriate frag and vert
 // shaders into a program and into gl
-function drawSprite(img, x, y, scale) {
+function drawSprite(sheet, i, x, y, scale) {
 
 
   // CONSTRUCT VERTICES FOR SQUARE AND LOAD THEM INTO THE PROGRAM
@@ -147,6 +146,15 @@ function drawSprite(img, x, y, scale) {
   
 
 
+    // make a texture sampler matrix based on i
+    // rotation params (i'm not even using them bc fuck that rn lol)
+    let sheetScaleLocation = gl.getUniformLocation(program, "u_sheetScale");
+    
+    gl.uniform1f(sheetScaleLocation, 3.0);
+
+    let sheetTranslateLocation = gl.getUniformLocation(program, "u_sheetTranslate");
+    
+    gl.uniform1f(sheetTranslateLocation, i);
 
 
   // PREP TEXTURE THAT WILL BE PAINTED ONTO THE SQUARE
@@ -176,7 +184,7 @@ function drawSprite(img, x, y, scale) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
   // Upload the image into the texture.
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sheet);
 
 
   // draw the texture onto the triangle
@@ -197,24 +205,24 @@ class Char {
   // this is exported by aseprite with fran's export settings that 
   // he likes so that this all works
 
-  // <sheet> is a path to a spritesheet .png
-  // <meta> is a path to a .json containing animation metadata
-  constructor(sheet, meta) {
-    this.sheet = sheet;
+  // <sheet_path> is a path to a spritesheet .png
+  // <meta> is a object derived from the JSON produced by aseprite
+  constructor(sheet_path, meta) {
+    this.sheet_path = sheet_path;
     this.meta = meta;
 
 
-    // load the image
-    let img = new Image();
-    img.src = sheet;
+    // load the sprite sheet
+    let sheet = new Image();
+    sheet.src = sheet_path;
 
 
     this.loaded = false;
-    img.onload = function() {
+    sheet.onload = function() {
       this.loaded = true;
     }
 
-    this.img = img;
+    this.sheet = sheet;
 
     // by default, just "animate" based on the first sprite in the sheet
     this.curr_i = 0;
@@ -239,12 +247,9 @@ class Char {
 
   // <sheet> is a the spritesheet .png
   // <i> is the index of the sprite in the sheet
-  drawFrameFromSheet(sheet, i, x, y) {
+  drawFrameFromSheet(gl, sheet, i, x, y) {
 
-    // make a texture sampler matrix based on i
-
-
-    drawSprite(this.img, 100, 40, 1);
+    drawSprite(sheet, i, 100, 40, 1);
   }
 
   draw(gl) {
@@ -262,10 +267,9 @@ class Char {
 
     console.log(curr_frame);
 
-    this.drawFrameFromSheet(this.sheet, frame_i, 140, 40);
+    this.drawFrameFromSheet(gl, this.sheet, frame_i, 140, 40);
     
 
-    drawSprite(this.img, 100, 40, 1);
   }
 }
 
@@ -302,7 +306,7 @@ function drawFrame(now) {
   
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  char.draw(gl, "walk");
+  char.draw(gl);
 
   requestAnimationFrame(drawFrame);
 }
