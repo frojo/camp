@@ -4,6 +4,7 @@ import charMeta from "./assets/char.json";
 
 import * as TWGL  from "twgl.js";
 let m4 = TWGL.m4;
+let v3 = TWGL.v3;
 
 const canvas = document.querySelector('canvas');
 
@@ -75,6 +76,28 @@ var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
 // sets this uniform on the last program that we called useProgram on
 gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
+function projection(width, height, depth) {
+  // Note: This matrix flips the Y axis so 0 is at the top.
+  return [
+    2 / width, 0, 0, 0,
+    0, -2 / height, 0, 0,
+    0, 0, 2 / depth, 0,
+    -1, 1, 0, 1,
+  ];
+}
+
+// thank you https://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html
+function perspective(fieldOfViewInRadians, aspect, near, far) {
+  var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+  var rangeInv = 1.0 / (near - far);
+
+  return [
+    f / aspect, 0, 0, 0,
+    0, f, 0, 0,
+    0, 0, (near + far) * rangeInv, -1,
+    0, 0, near * far * rangeInv * 2, 0
+  ];
+}
 
 
 // gl.drawArrays(primitiveType, offset, count);
@@ -90,18 +113,20 @@ function drawSprite(sheet, i, x, y, scale) {
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   
-
   // construct array for triangle vertices
   // two triangles that form into a square of size 32x32
   // top-left of triangle is at (x,y) in pixel space
-  
+  //
+
+
+  let z = -300;
   var positions = [
-    0, 0, // top left
-    32, 0, // top right
-    0,  32, // bottom left 
-    0, 32, // bottom left
-    32, 0, // top right
-    32, 32, // bottom right
+    0, 0, z, // top left
+    32, 0, z, // top right
+    0,  32, z, // bottom left 
+    0, 32, z, // bottom left
+    32, 0, z, // top right
+    32, 32, z, // bottom right
   ];
   
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -109,7 +134,7 @@ function drawSprite(sheet, i, x, y, scale) {
   gl.enableVertexAttribArray(positionAttributeLocation);
 
   // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-  var size = 2;          // 2 components per iteration
+  var size = 3;          // 2 components per iteration
   var type = gl.FLOAT;   // the data is 32bit floats
   var normalize = false; // don't normalize the data
   var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
@@ -137,13 +162,21 @@ function drawSprite(sheet, i, x, y, scale) {
   // console.log(m3);
 
   // // pass in the transform matrix as a uniform
-  // var matrixLocation = gl.getUniformLocation(program, "u_transform");
-  // let transform = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight);
-  // transform = m4.translate(matrix, x, y);
+  //
+  let aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  let z_near = 1;
+  let z_far = 2000;
+  let fovRadians = Math.PI / 3;
+  // let transform = projection(gl.canvas.clientWidth, 
+  //                            gl.canvas.clientHeight, 300);
+  let transform = perspective(fovRadians, aspect, z_near, z_far);
+  transform = m4.translate(transform, v3.create(x, y, 0), 0);
   // transform = m4.rotate(matrix, 0);
-  // transform = m4.scale(matrix, 1, 1);
-  // gl.uniformMatrix4fv(matrixLocation, false, matrix);// Set the matrix.
-  
+  // transform = m4.scale(transform, 1, 1);
+
+
+  var transformLocation = gl.getUniformLocation(program, "u_transform");
+  gl.uniformMatrix4fv(transformLocation, false, transform);// Set the matrix.
 
 
     // make a texture sampler matrix based on i
@@ -240,7 +273,6 @@ class Char {
       return value.name == anim;
     });
 
-    console.log(anim_info);
     this.start_i = anim_info.from;
     this.end_i = anim_info.to;
   }
@@ -249,7 +281,7 @@ class Char {
   // <i> is the index of the sprite in the sheet
   drawFrameFromSheet(gl, sheet, i, x, y) {
 
-    drawSprite(sheet, i, 100, 40, 1);
+    drawSprite(sheet, i, -100, 0, 1);
   }
 
   draw(gl) {
@@ -263,9 +295,6 @@ class Char {
 
     const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
     const frame_i = this.start_i + curr_frame;
-    
-
-    console.log(curr_frame);
 
     this.drawFrameFromSheet(gl, this.sheet, frame_i, 140, 40);
     
@@ -276,6 +305,8 @@ class Char {
 var img;
 var char;
 function main() {
+
+  console.log(TWGL.m4);
 
   char = new Char(charSheet, charMeta);
 
