@@ -6,12 +6,94 @@ import * as TWGL  from "twgl.js";
 let m4 = TWGL.m4;
 let v3 = TWGL.v3;
 
-const canvas = document.querySelector('canvas');
+import { Scene, 
+        PerspectiveCamera,
+        WebGLRenderer,
+        BoxGeometry,
+        MeshBasicMaterial,
+        Mesh
+} from 'three';
 
-const gl = canvas.getContext('webgl');
-if (!gl) {
-  console.log('this browser/environment does not support webgl!');
+
+const scene = new Scene();
+const camera = new PerspectiveCamera(
+  75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+
+const renderer = new WebGLRenderer();
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild( renderer.domElement );
+
+const geometry = new BoxGeometry(1, 1, 1);
+const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 5;
+
+
+// this is the main render func
+let then = 0;
+function renderFrame(now) {
+  // variable framerate
+  let delta = now - then;
+  then = now;
+
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(renderFrame);
 }
+
+//var char;
+function main() {
+
+  // char = new Char(charSheet, charMeta);
+
+  // char.startAnim('walk');
+  
+
+  requestAnimationFrame(renderFrame);
+
+}
+
+main();
+
+
+
+
+// ======== BELOW THIS LINE IS WEBGL ============
+
+
+// webgl compatibility check
+// ripped from
+// https://github.com/mrdoob/three.js/blob/master/examples/jsm/WebGL.js
+function isWebGLAvailable() {
+
+  try {
+
+          const canvas = document.createElement( 'canvas' );
+          return !! ( window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) ) );
+
+        } catch ( e ) {
+
+                return false;
+
+              }
+
+}
+
+// const canvas = document.querySelector('canvas');
+// 
+// const gl = canvas.getContext('webgl');
+// if (!gl) {
+//   console.log('this browser/environment does not support webgl!');
+// }
+
 
 
 function createShader(gl, type, source) {
@@ -50,41 +132,32 @@ function createProgram(gl, vertexShader, fragmentShader) {
     gl.deleteProgram(program);
 }
 
-// create and compile shaders into webgl context
-var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
-var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
- 
-console.log(fragmentShaderSource);
-
-var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-console.log(vertexShader);
-console.log(fragmentShader);
-
-// create program and link shaders into program
-var program = createProgram(gl, vertexShader, fragmentShader);
-
-// ============ END PROGRAM CREATION/LINKING ===============
-// tell webgl to use the program (that's on the GPU)
-gl.useProgram(program);
-
-var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-
-
-
-// sets this uniform on the last program that we called useProgram on
-gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
-
-function projection(width, height, depth) {
-  // Note: This matrix flips the Y axis so 0 is at the top.
-  return [
-    2 / width, 0, 0, 0,
-    0, -2 / height, 0, 0,
-    0, 0, 2 / depth, 0,
-    -1, 1, 0, 1,
-  ];
-}
+// // create and compile shaders into webgl context
+// var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
+// var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
+//  
+// console.log(fragmentShaderSource);
+// 
+// var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+// var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+// 
+// console.log(vertexShader);
+// console.log(fragmentShader);
+// 
+// // create program and link shaders into program
+// var program = createProgram(gl, vertexShader, fragmentShader);
+// 
+// // ============ END PROGRAM CREATION/LINKING ===============
+// // tell webgl to use the program (that's on the GPU)
+// gl.useProgram(program);
+// 
+// var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+// 
+// 
+// 
+// // sets this uniform on the last program that we called useProgram on
+// gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+// 
 
 // thank you https://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html
 function perspective(fieldOfViewInRadians, aspect, near, far) {
@@ -167,8 +240,6 @@ function drawSprite(sheet, i, x, y, scale) {
   let z_near = 1;
   let z_far = 2000;
   let fovRadians = Math.PI / 3;
-  // let transform = projection(gl.canvas.clientWidth, 
-  //                            gl.canvas.clientHeight, 300);
   let transform = perspective(fovRadians, aspect, z_near, z_far);
   transform = m4.translate(transform, v3.create(x, y, 0), 0);
   // transform = m4.rotate(matrix, 0);
@@ -304,7 +375,7 @@ class Char {
 
 var img;
 var char;
-function main() {
+function old_main() {
 
   console.log(TWGL.m4);
 
@@ -316,11 +387,7 @@ function main() {
 
 }
 
-main();
-
-var then = 0;
-
-requestAnimationFrame(drawFrame);
+//main();
 
 // this is the main render func
 function drawFrame(now) {
