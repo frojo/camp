@@ -16,7 +16,8 @@ import { Scene,
 	Sprite,
 	SpriteMaterial,
 	PlaneGeometry,
-	DoubleSide
+	DoubleSide,
+	NearestFilter
 } from 'three';
 
 
@@ -38,6 +39,7 @@ scene.add( cube );
 camera.position.z = 10;
 
 const map = new TextureLoader().load(charSheet);
+map.magFilter = NearestFilter
 map.repeat.x = 1.0 / 3.0;
 map.offset.x = 2.0 / 3.0;
 const spr_material = new SpriteMaterial( { map: map } );
