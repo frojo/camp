@@ -11,7 +11,12 @@ import { Scene,
         WebGLRenderer,
         BoxGeometry,
         MeshBasicMaterial,
-        Mesh
+        Mesh,
+	TextureLoader,
+	Sprite,
+	SpriteMaterial,
+	PlaneGeometry,
+	DoubleSide
 } from 'three';
 
 
@@ -30,10 +35,26 @@ const material = new MeshBasicMaterial( { color: 0x00ff00 } );
 const cube = new Mesh( geometry, material );
 scene.add( cube );
 
-camera.position.z = 5;
+camera.position.z = 10;
+
+const map = new TextureLoader().load(charSheet);
+map.repeat.x = 1.0 / 3.0;
+map.offset.x = 2.0 / 3.0;
+const spr_material = new SpriteMaterial( { map: map } );
+
+const sprite = new Sprite( spr_material );
+sprite.position.z = 7;
+// scene.add( sprite );
+
+const plane_geometry = new PlaneGeometry( 1, 1 );
+const plane_material = new MeshBasicMaterial( {color: 0xffff00, side: DoubleSide, map: map} );
+const plane = new Mesh( plane_geometry, plane_material);
+plane.position.z = 7;
+plane.position.x = 0;
+scene.add( plane );
 
 
-// this is the main render func
+// this is the main render loop
 let then = 0;
 function renderFrame(now) {
   // variable framerate
@@ -43,6 +64,10 @@ function renderFrame(now) {
   cube.rotation.x += 0.01;
   cube.rotation.y += 0.01;
 
+  plane.rotation.y += 0.01;
+
+
+
 
   renderer.render(scene, camera);
 
@@ -51,10 +76,6 @@ function renderFrame(now) {
 
 //var char;
 function main() {
-
-  // char = new Char(charSheet, charMeta);
-
-  // char.startAnim('walk');
   
 
   requestAnimationFrame(renderFrame);
