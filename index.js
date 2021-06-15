@@ -1,6 +1,6 @@
 
-import charSheet from "./assets/char.png";
-import charMeta from "./assets/char.json";
+import spr_sheet from "./assets/char.png";
+import spr_meta from "./assets/char.json";
 
 import * as TWGL  from "twgl.js";
 let m4 = TWGL.m4;
@@ -11,50 +11,120 @@ import { Scene,
         WebGLRenderer,
         BoxGeometry,
         MeshBasicMaterial,
+        MeshPhongMaterial,
         Mesh,
-	TextureLoader,
-	Sprite,
-	SpriteMaterial,
-	PlaneGeometry,
-	DoubleSide,
-	NearestFilter
+	      TextureLoader,
+	      Sprite,
+	      SpriteMaterial,
+	      PlaneGeometry,
+	      DoubleSide,
+	      NearestFilter,
+        Color,
+        DirectionalLight
 } from 'three';
 
 
 const scene = new Scene();
+scene.background = new Color('darkgreen');
 const camera = new PerspectiveCamera(
   75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-
-const renderer = new WebGLRenderer();
+const canvas = document.querySelector('canvas');
+const renderer = new WebGLRenderer({canvas});
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild( renderer.domElement );
 
 const geometry = new BoxGeometry(1, 1, 1);
-const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+const material = new MeshPhongMaterial( { color: 0x00ff00,
+                                          flatShading: true} );
 const cube = new Mesh( geometry, material );
-scene.add( cube );
+//scene.add( cube );
 
 camera.position.z = 10;
 
-const map = new TextureLoader().load(charSheet);
-map.magFilter = NearestFilter
-map.repeat.x = 1.0 / 3.0;
-map.offset.x = 2.0 / 3.0;
-const spr_material = new SpriteMaterial( { map: map } );
+const light = new DirectionalLight({color: 0xFFFFFF,
+                                    intensity: 1
+                                   });
+light.position.set(-1, 2, 4);
+scene.add(light);
 
-const sprite = new Sprite( spr_material );
-sprite.position.z = 7;
-// scene.add( sprite );
+class Person {
+  // our pixelart person class
+  //
+  // the spritesheet is a horizontal row of sprites
+  // and it comes with a json file that has info on where the animations
+  // start and end
+  // this is exported by aseprite with fran's export settings that 
+  // he likes so that this all works
+  //
+  // <sheet_path> is a path to a spritesheet .png
+  // <meta> is a object derived from the JSON produced by aseprite
+  // <scene> is a reference to threejs scene
+  constructor(sheet_path, meta, scene) {
+    this.sheet_path = sheet_path;
+    this.meta = meta;
 
-const plane_geometry = new PlaneGeometry( 1, 1 );
-const plane_material = new MeshBasicMaterial( {color: 0xffff00, side: DoubleSide, map: map} );
-const plane = new Mesh( plane_geometry, plane_material);
-plane.position.z = 7;
-plane.position.x = 0;
-scene.add( plane );
+    // by default, just "animate" based on the first sprite in the sheet
+    this.curr_i = 0;
+    this.start_i = 0;
+    this.end_i = 0;
 
+    // create geometry/textures and add to threejs scene
+    const map = new TextureLoader().load(sheet_path);
+    map.magFilter = NearestFilter
+    map.repeat.x = 1.0 / 3.0;
+    map.offset.x = 2.0 / 3.0;
+    this.map = map;
+
+    const plane_geometry = new PlaneGeometry( 1, 1 );
+    const plane_material = new MeshPhongMaterial({
+      color: 0xffff00, 
+      transparent: true,
+      side: DoubleSide, 
+      flatShading: true, 
+      map: map} );
+
+    const plane = new Mesh( plane_geometry, plane_material);
+    plane.position.z = 7;
+    plane.position.x = 0;
+    scene.add( plane );
+
+  }
+
+  // anim is a string that is an id for the anim e.g. "walk"
+  startAnim(anim) {
+    //console.log(this.meta.meta.frameTags);
+    let tags = this.meta.meta.frameTags;
+
+    const anim_info = tags.find(function(value) {
+      return value.name == anim;
+    });
+
+    this.start_i = anim_info.from;
+    this.end_i = anim_info.to;
+  }
+
+  update() {
+
+    // determine which frame we're on
+    const t_ms = Date.now();
+    const num_frames = this.end_i - this.start_i + 1;
+
+    // assume for now that every frame lasts for .5 seconds
+    const frame_dur = 500;
+
+    const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
+    const frame_i = this.start_i + curr_frame;
+
+    this.map.offset.x = frame_i / 3.0;
+
+    //this.drawFrameFromSheet(gl, this.sheet, frame_i, 140, 40);
+    
+
+  }
+}
+
+var person;
 
 // this is the main render loop
 let then = 0;
@@ -66,9 +136,7 @@ function renderFrame(now) {
   cube.rotation.x += 0.01;
   cube.rotation.y += 0.01;
 
-  plane.rotation.y += 0.01;
-
-
+  person.update()
 
 
   renderer.render(scene, camera);
@@ -79,6 +147,9 @@ function renderFrame(now) {
 //var char;
 function main() {
   
+  person = new Person(spr_sheet, spr_meta, scene);
+
+  person.startAnim('walk');
 
   requestAnimationFrame(renderFrame);
 
@@ -322,79 +393,6 @@ function drawSprite(sheet, i, x, y, scale) {
 
 }
 
-class Char {
-
-
-  // we're assuming the sheet is a horizontal row of sprites
-  // and it comes with a json file that has info on where the animations
-  // start and end
-  //
-  // this is exported by aseprite with fran's export settings that 
-  // he likes so that this all works
-
-  // <sheet_path> is a path to a spritesheet .png
-  // <meta> is a object derived from the JSON produced by aseprite
-  constructor(sheet_path, meta) {
-    this.sheet_path = sheet_path;
-    this.meta = meta;
-
-
-    // load the sprite sheet
-    let sheet = new Image();
-    sheet.src = sheet_path;
-
-
-    this.loaded = false;
-    sheet.onload = function() {
-      this.loaded = true;
-    }
-
-    this.sheet = sheet;
-
-    // by default, just "animate" based on the first sprite in the sheet
-    this.curr_i = 0;
-    this.start_i = 0;
-    this.end_i = 0;
-
-  }
-
-  // anim is a string that is an id for the anim e.g. "walk"
-  startAnim(anim) {
-    //console.log(this.meta.meta.frameTags);
-    let tags = this.meta.meta.frameTags;
-
-    const anim_info = tags.find(function(value) {
-      return value.name == anim;
-    });
-
-    this.start_i = anim_info.from;
-    this.end_i = anim_info.to;
-  }
-
-  // <sheet> is a the spritesheet .png
-  // <i> is the index of the sprite in the sheet
-  drawFrameFromSheet(gl, sheet, i, x, y) {
-
-    drawSprite(sheet, i, -100, 0, 1);
-  }
-
-  draw(gl) {
-
-    // determine which frame we're on
-    const t_ms = Date.now();
-    const num_frames = this.end_i - this.start_i + 1;
-
-    // assume for now that every frame lasts for .5 seconds
-    const frame_dur = 500;
-
-    const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
-    const frame_i = this.start_i + curr_frame;
-
-    this.drawFrameFromSheet(gl, this.sheet, frame_i, 140, 40);
-    
-
-  }
-}
 
 var img;
 var char;
@@ -402,7 +400,7 @@ function old_main() {
 
   console.log(TWGL.m4);
 
-  char = new Char(charSheet, charMeta);
+  char = new Person(spr_sheet, spr_meta);
 
   char.startAnim('walk');
 
