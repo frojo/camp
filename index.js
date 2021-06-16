@@ -27,7 +27,7 @@ import { Scene,
 
 
 const scene = new Scene();
-const bg_color = new Color('white');
+const bg_color = new Color('black');
 scene.background = bg_color;
 scene.fog = new Fog(bg_color, 10, 100);
 const camera = new PerspectiveCamera(
@@ -117,7 +117,7 @@ class Person {
     const num_frames = this.end_i - this.start_i + 1;
 
     // assume for now that every frame lasts for .5 seconds
-    const frame_dur = 500;
+    const frame_dur = 300;
 
     const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
     const frame_i = this.start_i + curr_frame;
@@ -129,6 +129,44 @@ class Person {
     this.plane.position.copy(this.position);
 
   }
+}
+
+function makeGround(scene) {
+
+  // make a square pixelated ground plane centered on (0, 0, 0)
+  // width and length are <size>
+  // there are <resolution> "pixels" in each row/column
+  const size = 30;
+  const resolution = 10;
+
+  const extent = size / 2;
+  const pixel_size = size / resolution;
+
+  for (let x = -extent; x < extent; x += pixel_size) {
+    for (let z = -extent; z < extent; z += pixel_size) {
+
+      const r = Math.random() * 255;
+      const g = Math.random() * 255;
+      const b = Math.random() * 255;
+      const color = new Color(0,
+			      Math.random(),
+			      0);
+
+      const tile_geo = new PlaneGeometry(pixel_size, pixel_size);
+      const tile_mat = new MeshPhongMaterial({
+        color: color,
+        side: DoubleSide});
+
+      const tile = new Mesh(tile_geo, tile_mat);
+      tile.position.x = x;
+      tile.position.z = z;
+      tile.rotateX(-Math.PI / 2);
+      scene.add(tile);
+
+    }
+
+  }
+
 }
 
 var person;
@@ -158,11 +196,13 @@ function main() {
   // make ground plane
   const ground_geo = new PlaneGeometry( 100, 100 );
   const ground_mat = new MeshPhongMaterial({
+    color: 0x00ff00,
     side: DoubleSide});
 
   ground = new Mesh( ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
-  scene.add( ground );
+  //scene.add( ground );
+  makeGround(scene);
   
   person = new Person(spr_sheet, spr_meta, scene);
   person.position.z = 6;
