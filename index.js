@@ -20,7 +20,8 @@ import { Scene,
 	      DoubleSide,
 	      NearestFilter,
         Color,
-        DirectionalLight
+        DirectionalLight,
+	Vector3
 } from 'three';
 
 
@@ -41,6 +42,7 @@ const cube = new Mesh( geometry, material );
 //scene.add( cube );
 
 camera.position.z = 10;
+camera.position.y = 2;
 
 const light = new DirectionalLight({color: 0xFFFFFF,
                                     intensity: 1
@@ -78,16 +80,17 @@ class Person {
 
     const plane_geometry = new PlaneGeometry( 1, 1 );
     const plane_material = new MeshPhongMaterial({
-      color: 0xffff00, 
       transparent: true,
       side: DoubleSide, 
       flatShading: true, 
       map: map} );
 
     const plane = new Mesh( plane_geometry, plane_material);
-    plane.position.z = 7;
-    plane.position.x = 0;
+    this.plane = plane;
     scene.add( plane );
+
+    // "hack" so that we can do e.g. person.position.x = x 
+    this.position = new Vector3(0, 0, 0);
 
   }
 
@@ -117,14 +120,16 @@ class Person {
     const frame_i = this.start_i + curr_frame;
 
     this.map.offset.x = frame_i / 3.0;
-
-    //this.drawFrameFromSheet(gl, this.sheet, frame_i, 140, 40);
     
+    // update position
+    // "hack" so that we can do e.g. person.position.x = x 
+    this.plane.position.copy(this.position);
 
   }
 }
 
 var person;
+var ground;
 
 // this is the main render loop
 let then = 0;
@@ -146,13 +151,23 @@ function renderFrame(now) {
 
 //var char;
 function main() {
+
+  // make ground plane
+  const ground_geo = new PlaneGeometry( 100, 100 );
+  const ground_mat = new MeshPhongMaterial({
+    side: DoubleSide, 
+    flatShading: true});
+
+  ground = new Mesh( ground_geo, ground_mat);
+  ground.rotateX(-Math.PI / 2);
+  scene.add( ground );
   
   person = new Person(spr_sheet, spr_meta, scene);
-
+  person.position.z = 6;
+  person.position.y = .5;
   person.startAnim('walk');
 
   requestAnimationFrame(renderFrame);
-
 }
 
 main();
