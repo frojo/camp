@@ -5,8 +5,11 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
+    "dat.gui": "^0.7.7",
     "parcel-bundler": "^1.12.5",
     "three": "^0.129.0",
+    "three-dat.gui": "^2.0.7",
+    "three-orbitcontrols-ts": "^0.1.2",
     "twgl.js": "^4.19.1"
   }
 }

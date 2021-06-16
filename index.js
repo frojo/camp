@@ -2,9 +2,9 @@
 import spr_sheet from "./assets/char.png";
 import spr_meta from "./assets/char.json";
 
-import * as TWGL  from "twgl.js";
-let m4 = TWGL.m4;
-let v3 = TWGL.v3;
+// import * as TWGL  from "twgl.js";
+// let m4 = TWGL.m4;
+// let v3 = TWGL.v3;
 
 import { Scene, 
         PerspectiveCamera,
@@ -26,6 +26,14 @@ import { Scene,
 } from 'three';
 
 
+
+
+import { OrbitControls } from 'three-orbitcontrols-ts';
+
+import { GUI } from 'dat.gui';
+
+const gui = new GUI();
+
 const scene = new Scene();
 const bg_color = new Color('black');
 scene.background = bg_color;
@@ -35,6 +43,16 @@ const camera = new PerspectiveCamera(
 
 const canvas = document.querySelector('canvas');
 const renderer = new WebGLRenderer({canvas});
+
+// const controls = new FlyControls(camera, renderer.domElement);
+console.log(OrbitControls);
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// controls.movementSpeed = 1000;
+// controls.domElement = renderer.domElement;
+// controls.rollSpeed = Math.PI / 24;
+// controls.autoForward = false;
+// controls.dragToLook = false;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -201,8 +219,8 @@ function main() {
 
   ground = new Mesh( ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
-  //scene.add( ground );
-  makeGround(scene);
+  scene.add( ground );
+  // makeGround(scene);
   
   person = new Person(spr_sheet, spr_meta, scene);
   person.position.z = 6;
