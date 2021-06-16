@@ -12,6 +12,7 @@ import { Scene,
         BoxGeometry,
         MeshBasicMaterial,
         MeshPhongMaterial,
+	ShaderMaterial,
         Mesh,
 	      TextureLoader,
 	      Sprite,
@@ -210,12 +211,18 @@ function renderFrame(now) {
 
 //var char;
 function main() {
+  var frag_shader = document.querySelector("#fragment-shader-pixel-grass").text;
+  console.log(frag_shader);
+
 
   // make ground plane
   const ground_geo = new PlaneGeometry( 100, 100 );
-  const ground_mat = new MeshPhongMaterial({
-    color: 0x00ff00,
-    side: DoubleSide});
+ //    const ground_mat = new MeshPhongMaterial({
+ //      color: 0x00ff00,
+ //      side: DoubleSide});
+
+  const ground_mat = new ShaderMaterial({
+    fragmentShader: frag_shader});
 
   ground = new Mesh( ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);

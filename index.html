@@ -56,6 +56,19 @@
       gl_FragColor = texture2D(u_image, v_texCoord);
     }
   </script>
+  <script id="fragment-shader-pixel-grass" type="notjs">
+    // fragment shaders don't have a dfault precision so we need to 
+    // pick one. mediump is a good default
+    // precision mediump float;
+
+    // uniform sampler2D u_image;
+
+    // varying vec2 v_texCoord;
+
+    void main() {
+      gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+    }
+  </script>
   <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
   <script src="./index.js"></script>
 </html>
