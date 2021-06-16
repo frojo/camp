@@ -21,12 +21,15 @@ import { Scene,
 	      NearestFilter,
         Color,
         DirectionalLight,
-	Vector3
+	Vector3,
+	Fog
 } from 'three';
 
 
 const scene = new Scene();
-scene.background = new Color('darkgreen');
+const bg_color = new Color('white');
+scene.background = bg_color;
+scene.fog = new Fog(bg_color, 10, 100);
 const camera = new PerspectiveCamera(
   75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -155,8 +158,7 @@ function main() {
   // make ground plane
   const ground_geo = new PlaneGeometry( 100, 100 );
   const ground_mat = new MeshPhongMaterial({
-    side: DoubleSide, 
-    flatShading: true});
+    side: DoubleSide});
 
   ground = new Mesh( ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
