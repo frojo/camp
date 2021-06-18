@@ -198,8 +198,6 @@ function renderFrame(now) {
   let delta = now - then;
   then = now;
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
 
   person.update()
 
@@ -223,6 +221,7 @@ function main() {
 
   const ground_mat = new ShaderMaterial({
     fragmentShader: frag_shader});
+  // ground_mat.fog = true;
 
   ground = new Mesh( ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
