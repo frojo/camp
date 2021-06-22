@@ -1,17 +1,41 @@
 
-next: get ground plane textured
+next: click to move
 
 
 
 later:
 
+get ground textured
 camera at a better angle
 maybe just a spot light somewhere
 fireflies/fire/some lighting
 ooo myabe some stars
-click to move around - https://threejsfundamentals.org/threejs/lessons/threejs-picking.html
-
 trees?
+resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
+
+# 6/22
+
+ok lets see if i can click to move
+
+hell yeha got the raycaster working
+
+ok now i need to make her walk there.
+i think first i'll teleport her
+then do interpolation
+then get it so that she idles when she's not moving, and does the walking anim when she is
+and then maybe refactor the Person class to do this nicely using anim tags from aseprite
+
+so the built in three js vector3 lerp has a param that is like the percentage between the origin and the target... i dont think thats super useful to me bc i want the walk speed to be the same, no matter the distance
+
+what i want is like the direction between current location and target
+and then every frame move greta <walkSpeed> in that direction
+yeah ane maybe there can be some acceleration at the beginning and end if i'm fancy but nahhhh
+
+i got some cool vibrating glitch effects that i'd love to try to do on purpose later. but it basically works! still dont have her idling when she's not moving, but im gonna eat lunch
+
+# 6/18
+
+getting this ground textured is turning out to be harder than i thought and i'm tired of it so i'm going to try to do something else next. i want to be able to click somewhere, and the character will walk there. like runescape
 
 # 6/16
 
