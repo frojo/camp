@@ -44,20 +44,12 @@ const camera = new PerspectiveCamera(
 const canvas = document.querySelector('canvas');
 const renderer = new WebGLRenderer({canvas});
 
-// const controls = new FlyControls(camera, renderer.domElement);
-console.log(OrbitControls);
 const controls = new OrbitControls(camera, renderer.domElement);
 
 controls.mouseButtons =  {
   ORBIT : MOUSE.RIGHT
 }
 controls.enablePan = true;
-
-// controls.movementSpeed = 1000;
-// controls.domElement = renderer.domElement;
-// controls.rollSpeed = Math.PI / 24;
-// controls.autoForward = false;
-// controls.dragToLook = false;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -81,9 +73,11 @@ class Person {
   //
   // the spritesheet is a horizontal row of sprites
   // and it comes with a json file that has info on where the animations
-  // start and end
-  // this is exported by aseprite with fran's export settings that 
-  // he likes so that this all works
+  // start and end etc.
+  // the JSON has to be exported by aseprite with certain export settings
+  // which are mostly defaults except for:
+  // Array (not Hash)
+  // set "Item Filename" to {tag}{tagframe}
   //
   // <sheet_path> is a path to a spritesheet .png
   // <meta> is a object derived from the JSON produced by aseprite
@@ -92,18 +86,23 @@ class Person {
     this.sheet_path = sheet_path;
     this.meta = meta;
 
-    // by default, just "animate" based on the first sprite in the sheet
+    // frame indices
     this.curr_i = 0;
     this.start_i = 0;
     this.end_i = 0;
 
+    // how many frames in the sprite sheet
+    this.frame_num = this.meta.frames.length;
+
     // create geometry/textures and add to threejs scene
     const map = new TextureLoader().load(sheet_path);
+    // get those crisp pixels
     map.magFilter = NearestFilter
-    map.repeat.x = 1.0 / 3.0;
-    map.offset.x = 2.0 / 3.0;
+    // sample one frame at a time from the sprite sheet
+    map.repeat.x = 1.0 / this.frame_num;
     this.map = map;
 
+    // threejs obj stuff
     const plane_geometry = new PlaneGeometry( 1, 1 );
     const plane_material = new MeshPhongMaterial({
       transparent: true,
@@ -115,23 +114,29 @@ class Person {
     this.plane = plane;
     scene.add( plane );
 
-    // our internal position tracker
+    // our internal world position tracker
     this.position = new Vector3(0, .5, 0);
 
     this.walkTarget = new Vector3(0, .5, 0);
-    this.walkSpeed = .03;
+    this.walk_speed = .01
     this.walking = false;
+
+    this.startAnim('idle');
 
   }
 
   // anim is a string that is an id for the anim e.g. "walk"
   startAnim(anim) {
-    //console.log(this.meta.meta.frameTags);
     let tags = this.meta.meta.frameTags;
 
     const anim_info = tags.find(function(value) {
       return value.name == anim;
     });
+
+    if (!anim_info) {
+      console.log('ERROR: no animation with that tag!!');
+      return;
+    }
 
     this.start_i = anim_info.from;
     this.end_i = anim_info.to;
@@ -151,12 +156,10 @@ class Person {
     // the ground plane is at y=0, but our person has to be at y=.5
     // so as not to be cut in half by the ground plane
     target.y = .5;
-    console.log('CHANGING WALK TARGET');
     this.walkTarget.copy(target);
 
+    this.startAnim('walk');
     this.walking = true;
-
-    //console.log(this.walkTarget);
 
   }
 
@@ -166,28 +169,37 @@ class Person {
     const t_ms = Date.now();
     const num_frames = this.end_i - this.start_i + 1;
 
-    // assume for now that every frame lasts for .5 seconds
-    const frame_dur = 300;
+    // assume for now that every frame lasts for 300ms
+    const frame_dur = 200;
 
     const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
     const frame_i = this.start_i + curr_frame;
 
-    this.map.offset.x = frame_i / 3.0;
+    this.map.offset.x = frame_i / this.frame_num;
 
 
     if (this.walking) {
-    // get a unit vector in the direction from our current point to 
-    // the target by subtracting and then normalizing
+      // get a unit vector in the direction from our current point to 
+      // the target by subtracting and then normalizing
       const dir = this.walkTarget.clone()
       dir.sub(this.position);
       dir.normalize();
-      dir.multiplyScalar(this.walkSpeed);
+      dir.multiplyScalar(this.walk_speed);
       this.position.add(dir);
+
+      // face us in the direction we're walking
+      if (dir.x < 0) {
+        this.plane.scale.x = -1;
+      } else {
+        this.plane.scale.x = 1;
+      }
+
 
       // if we're close enough to the target, stop walking
       // (avoids admittedly cool vibrating glitch)
       const dist = this.position.distanceToSquared(this.walkTarget);
       if (dist < .001) {
+        this.startAnim('idle');
         this.walking = false;
       }
       
@@ -273,14 +285,13 @@ function main() {
   //   fragmentShader: frag_shader});
   // ground_mat.fog = true;
 
-  ground = new Mesh( ground_geo, ground_mat);
+  ground = new Mesh(ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
   scene.add( ground );
   // makeGround(scene);
   
   greta = new Person(spr_sheet, spr_meta, scene);
   greta.teleport(new Vector3(0, 0, 6));
-  greta.startAnim('walk');
 
   requestAnimationFrame(renderFrame);
 }
@@ -288,7 +299,6 @@ function main() {
 // input
 //
 function onMouseMove(event) {
-  console.log('mouse moving');
 
 }
 
@@ -305,8 +315,6 @@ function addDebugCube(scene, worldCoords) {
 }
 
 function onClick(event) {
-  console.log('mouse clicked');
-
 
   const raycaster = new Raycaster();
   const mouse = new Vector2();
