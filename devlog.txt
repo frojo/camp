@@ -1,11 +1,11 @@
 
-next: spot light/lighting stuff
+next: make some lamps
 
 try lambert instead of phong?
 
 maybe later:
 
-camera at a better angle/position
+camera: follows character, and at a better angle/position
 dialog/text
 maybe just a spot light somewhere
 fireflies/fire/some lighting
@@ -14,6 +14,18 @@ trees?
 resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+
+# 6/28
+
+so lighting is harder than i thought.
+
+
+the point light is good for the effect of the lamp on other obejctrs in the scene, but i need to be able to actually see the lamp
+
+this video talks about using EffectComposer https://www.youtube.com/watch?v=d0C_bxzG850
+o maybe what i want to read about is postprocessing in general...
+oh yeah what i want is bloom
+they got that unreal bloom.... okay cooool
 
 
 # 6/23

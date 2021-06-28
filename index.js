@@ -21,6 +21,8 @@ import { Scene,
         Color,
         DirectionalLight,
         AmbientLight,
+        PointLight,
+        PointLightHelper,
         SpotLight,
 	Vector3,
   Vector2,
@@ -73,8 +75,50 @@ const spot = new SpotLight({color: 0xFFFFFF});
 spot.position.set(0, 3, 7);
 spot.intensity = 2;
 spot.castShadow = true;
+//scene.add(spot);
 
-scene.add(spot);
+const point_light = new PointLight({color: 0xFFFFFF});
+point_light.position.set(0, 3, 7);
+point_light.intensity = 2;
+point_light.castShadow = true;
+scene.add(point_light);
+
+const point_helper = new PointLightHelper(point_light);
+//scene.add(point_helper);
+
+// gui helpers
+class ColorGUIHelper {
+  constructor(object, prop) {
+    this.object = object;
+    this.prop = prop;
+  }
+  get value() {
+    return `#${this.object[this.prop].getHexString()}`;
+  }
+  set value(hexString) {
+    this.object[this.prop].set(hexString);
+  }
+}
+
+function makeXYZGUI(gui, vector3, name, onChangeFn) {
+  const folder = gui.addFolder(name);
+  folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
+  folder.add(vector3, 'y', 0, 10).onChange(onChangeFn);
+  folder.add(vector3, 'z', -10, 10).onChange(onChangeFn);
+  folder.open();
+}
+
+function dummy() {
+
+}
+
+gui.addColor(new ColorGUIHelper(point_light, 'color'), 'value').name('color');
+
+gui.add(point_light, 'intensity', 0, 2, 0.01);
+makeXYZGUI(gui, point_light.position, 'position', dummy);
+
+
+
 
 class Person {
   // our papermario/magicwand pixelart person class
@@ -255,7 +299,14 @@ function makeGround(scene) {
 
 }
 
-var person;
+function makeLamp(position) {
+  const point_light = new PointLight({color: 0xFFFFFF});
+  point_light.position.set(position);
+  point_light.intensity = 2;
+  point_light.castShadow = true;
+  scene.add(point_light);
+}
+
 var ground;
 
 // this is the main render loop
@@ -293,17 +344,15 @@ function main() {
     map: tex
   });
 
-  
-
-  // const ground_mat = new ShaderMaterial({
-  //   fragmentShader: frag_shader});
-  // ground_mat.fog = true;
-
   ground = new Mesh(ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
   scene.add( ground );
-  // makeGround(scene);
+
+
+  // add lamps
   
+
+  // add greta
   greta = new Person(spr_sheet, spr_meta, scene);
   greta.teleport(new Vector3(0, 0, 6));
 
