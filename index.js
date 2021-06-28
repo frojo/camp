@@ -1,6 +1,7 @@
 
 import spr_sheet from "./assets/char.png";
 import spr_meta from "./assets/char.json";
+import ground_tex from "./assets/ground.png";
 
 import { Scene, 
         PerspectiveCamera,
@@ -8,6 +9,7 @@ import { Scene,
         BoxGeometry,
         MeshBasicMaterial,
         MeshPhongMaterial,
+        MeshLambertMaterial,
 	ShaderMaterial,
         Mesh,
 	      TextureLoader,
@@ -18,14 +20,15 @@ import { Scene,
 	      NearestFilter,
         Color,
         DirectionalLight,
+        AmbientLight,
+        SpotLight,
 	Vector3,
   Vector2,
 	Fog,
   Raycaster,
-  MOUSE
+  MOUSE,
+  RepeatWrapping
 } from 'three';
-
-
 
 
 import { OrbitControls } from 'three-orbitcontrols-ts';
@@ -53,23 +56,28 @@ controls.enablePan = true;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-const geometry = new BoxGeometry(1, 1, 1);
-const material = new MeshPhongMaterial( { color: 0x00ff00,
-                                          flatShading: true} );
-const cube = new Mesh( geometry, material );
-//scene.add( cube );
-
 camera.position.z = 10;
 camera.position.y = 2;
 
 const light = new DirectionalLight({color: 0xFFFFFF,
-                                    intensity: 1
+                                    intensity: .0001,
                                    });
+
+// const light = new AmbientLight({color: 0xFFFFFF,
+//                                     intensity: .01,
+//                                    });
 light.position.set(-1, 2, 4);
 scene.add(light);
 
+const spot = new SpotLight({color: 0xFFFFFF});
+spot.position.set(0, 3, 7);
+spot.intensity = 2;
+spot.castShadow = true;
+
+scene.add(spot);
+
 class Person {
-  // our papermario pixelart person class
+  // our papermario/magicwand pixelart person class
   //
   // the spritesheet is a horizontal row of sprites
   // and it comes with a json file that has info on where the animations
@@ -104,7 +112,7 @@ class Person {
 
     // threejs obj stuff
     const plane_geometry = new PlaneGeometry( 1, 1 );
-    const plane_material = new MeshPhongMaterial({
+    const plane_material = new MeshLambertMaterial({
       transparent: true,
       side: DoubleSide, 
       flatShading: true, 
@@ -142,7 +150,8 @@ class Person {
     this.end_i = anim_info.to;
   }
 
-  // <target> is Vector3 world coords on the ground plane of where our person is teleported to
+  // <target> is Vector3 world coords on the ground plane 
+  // where we are teleported to
   teleport(target) {
     // the ground plane is at y=0, but our person has to be at y=.5
     // so as not to be cut in half by the ground plane
@@ -150,9 +159,9 @@ class Person {
     this.position.copy(target);
   }
 
-  // <target> is Vector3 world coords on the ground plane of where our person is walking to
+  // <target> is Vector3 world coords on the ground plane 
+  // we begin to walk to
   walkTo(target) {
-
     // the ground plane is at y=0, but our person has to be at y=.5
     // so as not to be cut in half by the ground plane
     target.y = .5;
@@ -160,16 +169,14 @@ class Person {
 
     this.startAnim('walk');
     this.walking = true;
-
   }
 
   update() {
-
     // determine which frame we're on
     const t_ms = Date.now();
     const num_frames = this.end_i - this.start_i + 1;
 
-    // assume for now that every frame lasts for 300ms
+    // assume for now that every frame lasts for 200ms
     const frame_dur = 200;
 
     const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
@@ -212,7 +219,6 @@ class Person {
 }
 
 function makeGround(scene) {
-
   // make a square pixelated ground plane centered on (0, 0, 0)
   // width and length are <size>
   // there are <resolution> "pixels" in each row/column
@@ -276,10 +282,18 @@ function main() {
 
 
   // make ground plane
+  const tex = new TextureLoader().load(ground_tex);
+  // get those crisp pixels
+  tex.magFilter = NearestFilter;
+  tex.wrapS = RepeatWrapping;
+  tex.wrapT = RepeatWrapping;
+  tex.repeat.set(60, 60);
   const ground_geo = new PlaneGeometry( 100, 100 );
-  const ground_mat = new MeshPhongMaterial({
-    color: 0x3e631d,
-    side: DoubleSide});
+  const ground_mat = new MeshLambertMaterial({
+    map: tex
+  });
+
+  
 
   // const ground_mat = new ShaderMaterial({
   //   fragmentShader: frag_shader});
@@ -328,30 +342,13 @@ function onClick(event) {
   const intersects = raycaster.intersectObject(ground);
 
   const walkTarget = intersects[0].point;
-
-  //console.log(walkTarget);
-
   greta.walkTo(intersects[0].point);
-  //greta.teleport(intersects[0].point);
-
-  // greta.position.copy(intersects[0].point);
-  // greta.position.y = .5;
-
-  
-
-
 }
 
 window.addEventListener('mousemove', onMouseMove, false);
 window.addEventListener('click', onClick, false);
 
 main();
-
-
-
-
-// ======== BELOW THIS LINE IS WEBGL ============
-
 
 // webgl compatibility check
 // ripped from

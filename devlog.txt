@@ -1,22 +1,30 @@
 
-next: stand when not moving
+next: spot light/lighting stuff
 
+try lambert instead of phong?
 
+maybe later:
 
-later:
-
-get ground textured
-camera at a better angle
+camera at a better angle/position
+dialog/text
 maybe just a spot light somewhere
 fireflies/fire/some lighting
 ooo myabe some stars
 trees?
 resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
+multiplayer
+better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+
 
 # 6/23
 
 lets see if we can make her stand when she's not moving and also turn in the direction she's walking
 
+we're just gonna do some simple texturing right quick by manually drwaing something in aseprite. i just want it to be something that's not a blank expanse
+
+yeah i mean it's meh. you can tell it's a repeated texture. i really do want to do procedurally generated ground pixels. but not yet
+
+hm the lighting is weirder than i thought. they're invisible except for thow they affect the environment. this might be a thing
 
 # 6/22
 
