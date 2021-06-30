@@ -32,8 +32,14 @@ import { Scene,
   RepeatWrapping
 } from 'three';
 
+import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/examples/jsm/postprocessing/BloomPass.js';
+import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import {FilmPass} from 'three/examples/jsm/postprocessing/FilmPass.js';
 
-import { OrbitControls } from 'three-orbitcontrols-ts';
+
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { GUI } from 'dat.gui';
 
@@ -85,6 +91,46 @@ scene.add(point_light);
 
 const point_helper = new PointLightHelper(point_light);
 //scene.add(point_helper);
+//
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+// const bloomPass = new BloomPass(
+//     1,    // strength
+//     25,   // kernel size
+//     4,    // sigma ?
+//     512,  // blur render target resolution
+// );
+// composer.addPass(bloomPass);
+
+const bloomPass = new UnrealBloomPass(
+  // what are these params?
+  new Vector2(window.innerWidth, window.innerHeight),
+  1.5,
+  0.4,
+  0.85,
+);
+bloomPass.renderToScreen = true;
+composer.addPass(bloomPass);
+
+const filmPass = new FilmPass(
+    0,   // noise intensity
+    0,  // scanline intensity
+    0,    // scanline count
+    false,  // grayscale
+);
+filmPass.renderToScreen = true;
+// composer.addPass(filmPass);
+//
+
+const params = {
+  // bloom params
+  exposure: 1,
+  strength: 5,
+  threshold: 0,
+  radius: 0
+};
 
 // gui helpers
 class ColorGUIHelper {
@@ -116,6 +162,34 @@ gui.addColor(new ColorGUIHelper(point_light, 'color'), 'value').name('color');
 
 gui.add(point_light, 'intensity', 0, 2, 0.01);
 makeXYZGUI(gui, point_light.position, 'position', dummy);
+
+
+// gui for post proessing
+{
+  const folder = gui.addFolder('bloom');
+  folder.add( params, 'exposure', 0.1, 2.0 ).onChange(
+    function ( value ) {
+      // not sure if this is doing anything rn
+      renderer.toneMappingExposure = Math.pow( value, 4.0 );
+    } );
+
+  folder.add( params, 'strength', 0.0, 3.0 ).onChange(
+    function ( value ) {
+      bloomPass.strength = Number( value );
+    } );
+
+  folder.add( params, 'threshold', 0.0, 1.0 ).onChange(
+    function ( value ) {
+      bloomPass.threshold = Number( value );
+    } );
+
+  folder.add( params, 'radius', 0.0, 1.0 ).onChange(
+    function ( value ) {
+      bloomPass.radius = Number( value );
+    } );
+
+  folder.open();
+}
 
 
 
@@ -320,7 +394,9 @@ function renderFrame(now) {
   greta.update()
 
 
-  renderer.render(scene, camera);
+  composer.setSize(canvas.width, canvas.height);
+  //renderer.render(scene, camera);
+  composer.render(delta);
 
   requestAnimationFrame(renderFrame);
 }
@@ -390,8 +466,11 @@ function onClick(event) {
 
   const intersects = raycaster.intersectObject(ground);
 
-  const walkTarget = intersects[0].point;
-  greta.walkTo(intersects[0].point);
+  if (intersects.length > 0) {
+    const walkTarget = intersects[0].point;
+    greta.walkTo(intersects[0].point);
+  }
+
 }
 
 window.addEventListener('mousemove', onMouseMove, false);

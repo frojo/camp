@@ -1,7 +1,13 @@
 
 next: make some lamps
 
-try lambert instead of phong?
+copy this guys method for getting selective bloom
+https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
+
+can use threejs layers to do bloom on only certain objects?
+
+maybe can use the ShaderPass with some custom shaders too
+LuminosityShader
 
 maybe later:
 
@@ -14,6 +20,18 @@ trees?
 resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+
+# 6/30
+
+yeah the unreal bloom is much better 
+
+# 6/29
+
+for some reason the bloom pass by itself won't render to the screen?
+
+that youtube video that i saw before with the sun - was it blooming the whole scene or just the sun? i think it was just the sun
+
+o so there's an unrealbloompass too
 
 # 6/28
 
