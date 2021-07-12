@@ -21,6 +21,23 @@ resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/t
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 
+# 7/7
+
+where were we
+selective bloom
+
+open source is nice: https://discourse.threejs.org/t/whats-the-easiest-recommended-way-to-create-glow-layers/4897/4
+
+ok after reading that i still don't really understand what's going on
+
+alright time to break out the ol notebook and start diagraming
+
+i wonder if darkenning like they do in the example will work for me? might have to do something else to hide it?
+
+we do need layers because that's how darkenNonBloomed() knows what to darken
+
+so we need to traverse the entire scene tree every frame? there's probably a way to keep track of only the objs we bloom or something.. mm maybe not though
+
 # 6/30
 
 yeah the unreal bloom is much better 
