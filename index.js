@@ -10,12 +10,13 @@ import { Scene,
         MeshBasicMaterial,
         MeshPhongMaterial,
         MeshLambertMaterial,
-	ShaderMaterial,
+	      ShaderMaterial,
         Mesh,
 	      TextureLoader,
 	      Sprite,
 	      SpriteMaterial,
 	      PlaneGeometry,
+        IcosahedronGeometry,
 	      DoubleSide,
 	      NearestFilter,
         Color,
@@ -29,19 +30,29 @@ import { Scene,
 	Fog,
   Raycaster,
   MOUSE,
-  RepeatWrapping
+  RepeatWrapping,
+  Layers,
 } from 'three';
 
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass.js';
 import {BloomPass} from 'three/examples/jsm/postprocessing/BloomPass.js';
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import {FilmPass} from 'three/examples/jsm/postprocessing/FilmPass.js';
+import {ShaderPass} from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { GUI } from 'dat.gui';
+
+const BASE_LAYER = 0, BLOOM_LAYER = 1;
+
+const bloomLayer = new Layers();
+bloomLayer.set(BLOOM_LAYER);
+
+const darkMaterial = new MeshBasicMaterial( {color: "black"});
+const materials = {};
+
 
 const gui = new GUI();
 
@@ -93,8 +104,6 @@ const point_helper = new PointLightHelper(point_light);
 //scene.add(point_helper);
 //
 
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
 
 // const bloomPass = new BloomPass(
 //     1,    // strength
@@ -111,18 +120,38 @@ const bloomPass = new UnrealBloomPass(
   0.4,
   0.85,
 );
-bloomPass.renderToScreen = true;
-composer.addPass(bloomPass);
 
-const filmPass = new FilmPass(
-    0,   // noise intensity
-    0,  // scanline intensity
-    0,    // scanline count
-    false,  // grayscale
+
+const renderPass = new RenderPass(scene, camera);
+
+const bloomComposer = new EffectComposer(renderer);
+bloomComposer.renderToScreen = false;
+bloomComposer.addPass(bloomPass);
+bloomComposer.addPass(renderPass);
+
+const vshader_bloom = document.getElementById('vshader-bloom');
+const fshader_bloom = document.getElementById('fshader-bloom');
+console.log(vshader_bloom);
+console.log(fshader_bloom);
+console.log(vshader_bloom.textContent);
+console.log(fshader_bloom.textContent);
+
+const finalPass = new ShaderPass(
+  new ShaderMaterial( {
+    uniforms: {
+      baseTexture: { value: null },
+      bloomTexture: { value: bloomComposer.renderTarget2.texture },
+      vertexShader: document.getElementById('vshader-bloom').textContent,
+      fragmentShader: document.getElementById('fshader-bloom').textContent,
+      defines: {}
+    }
+  } ), "baseTexture"
 );
-filmPass.renderToScreen = true;
-// composer.addPass(filmPass);
-//
+finalPass.needsSwap = true;
+
+const finalComposer = new EffectComposer(renderer);
+finalComposer.addPass(renderPass);
+finalComposer.addPass(finalPass);
 
 const params = {
   // bloom params
@@ -381,6 +410,22 @@ function makeLamp(position) {
   scene.add(point_light);
 }
 
+function darkenNonBloomed(obj) {
+  if (obj.isMesh && bloomLayer.test(obj.layers) == false) {
+
+    materials[obj.uuid] = obj.material;
+    obj.material = darkMaterial;
+  }
+}
+
+function restoreMaterial(obj) {
+  if (materials[obj.uuid]) {
+    obj.material = materials[obj.uuid];
+    delete materials[obj.uuid];
+  }
+
+}
+
 var ground;
 
 // this is the main render loop
@@ -394,9 +439,15 @@ function renderFrame(now) {
   greta.update()
 
 
-  composer.setSize(canvas.width, canvas.height);
+  bloomComposer.setSize(canvas.width, canvas.height);
+  // finalComposer.setSize(canvas.width, canvas.height);
   //renderer.render(scene, camera);
-  composer.render(delta);
+  // bloomComposer.render();
+
+  // scene.traverse(darkenNonBloomed);
+  bloomComposer.render();
+  // scene.traverse(restoreMaterial);
+  finalComposer.render();
 
   requestAnimationFrame(renderFrame);
 }
@@ -426,6 +477,16 @@ function main() {
 
 
   // add lamps
+  // const sphere_geo = new SphereGeometry(5, 32, 32);
+  const sphere_geo = new IcosahedronGeometry(1, 15);
+  const sphere_mat = new MeshBasicMaterial( {color: 0xff6714});
+  const sphere = new Mesh(sphere_geo, sphere_mat);
+  sphere.position.set(-3, 5, -30);
+  scene.add(sphere);
+  console.log('sphere added');
+
+  sphere.layers.enable(BLOOM_LAYER);
+
   
 
   // add greta

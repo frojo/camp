@@ -21,6 +21,12 @@ resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/t
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 
+# 7/12
+
+ok lets try to implement this now
+
+
+
 # 7/7
 
 where were we
