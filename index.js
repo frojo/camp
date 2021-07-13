@@ -440,14 +440,19 @@ function renderFrame(now) {
 
 
   bloomComposer.setSize(canvas.width, canvas.height);
-  // finalComposer.setSize(canvas.width, canvas.height);
+  finalComposer.setSize(canvas.width, canvas.height);
   //renderer.render(scene, camera);
   // bloomComposer.render();
 
-  // scene.traverse(darkenNonBloomed);
+  scene.traverse(darkenNonBloomed);
   bloomComposer.render();
-  // scene.traverse(restoreMaterial);
+  scene.traverse(restoreMaterial);
   finalComposer.render();
+
+  debugger;
+
+  
+
 
   requestAnimationFrame(renderFrame);
 }

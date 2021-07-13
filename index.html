@@ -115,8 +115,8 @@
 
     void main() {
 
-      // gl_FragColor = (texture2D(baseTexture, vUv) + vec4(1.0) * texture2D(bloomTexture, vUv) );
-      gl_FragColor = vec4(0, 1, 0, 1);
+      gl_FragColor = (texture2D(baseTexture, vUv) + vec4(1.0) * texture2D(bloomTexture, vUv) );
+      // gl_FragColor = vec4(0, 1, 0, 1);
     }
   </script>
   <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
