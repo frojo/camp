@@ -21,6 +21,28 @@ resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/t
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 
+# 7/14
+
+so i copypasted what i think is the right code from that example](https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html)
+
+but now i'm just getting this pure 0xff0000 red screen. maybe i should've done it in parts, at least more piece-wise than i did. after a couple hours of debugging i'm pretty burnt out. first thing i did today was post on the threejs discord asking for help, and now i'll get back into it.
+
+i don't think it's something with the glsl bc i triple-checked the shaders and then tried modifying to see if anything changed... i googled "red screen threejs" etc. and haven't found anything
+
+i wish there was a way to break up the postprocessing code... maybe there is but i don't understand it enough. maybe that's what i should try next
+
+well i found at least one bug! it matters what order you add postprocessing passes to the effect composer. for my bloomComposer, i think i was rendering to the screen before doing the bloom pass
+
+mmm still all red though...
+
+i wonder if i can get just the sphere thing to render. so only the bloom pass?
+
+oh yeah i got that. so i understand how that bit works i guesss..
+
+turns out i was missing a couple of brackets and so i wasn't passing in my shaders as the `vertexShader` or `fragmentShader` arguments for the ShaderMaterial... there goes 3 hours of my life :)
+
+ooo it works
+
 # 7/12
 
 ok lets try to implement this now

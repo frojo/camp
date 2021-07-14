@@ -126,8 +126,8 @@ const renderPass = new RenderPass(scene, camera);
 
 const bloomComposer = new EffectComposer(renderer);
 bloomComposer.renderToScreen = false;
-bloomComposer.addPass(bloomPass);
 bloomComposer.addPass(renderPass);
+bloomComposer.addPass(bloomPass);
 
 const vshader_bloom = document.getElementById('vshader-bloom');
 const fshader_bloom = document.getElementById('fshader-bloom');
@@ -139,12 +139,12 @@ console.log(fshader_bloom.textContent);
 const finalPass = new ShaderPass(
   new ShaderMaterial( {
     uniforms: {
-      baseTexture: { value: null },
-      bloomTexture: { value: bloomComposer.renderTarget2.texture },
-      vertexShader: document.getElementById('vshader-bloom').textContent,
-      fragmentShader: document.getElementById('fshader-bloom').textContent,
-      defines: {}
-    }
+        baseTexture: { value: null },
+        bloomTexture: { value: bloomComposer.renderTarget2.texture },
+    },
+    vertexShader: document.getElementById('vshader-bloom').textContent,
+    fragmentShader: document.getElementById('fshader-bloom').textContent,
+    defines: {}
   } ), "baseTexture"
 );
 finalPass.needsSwap = true;
@@ -204,6 +204,7 @@ makeXYZGUI(gui, point_light.position, 'position', dummy);
 
   folder.add( params, 'strength', 0.0, 3.0 ).onChange(
     function ( value ) {
+      console.log('changing strength');
       bloomPass.strength = Number( value );
     } );
 
@@ -442,14 +443,14 @@ function renderFrame(now) {
   bloomComposer.setSize(canvas.width, canvas.height);
   finalComposer.setSize(canvas.width, canvas.height);
   //renderer.render(scene, camera);
-  // bloomComposer.render();
+  //bloomComposer.render();
 
   scene.traverse(darkenNonBloomed);
   bloomComposer.render();
   scene.traverse(restoreMaterial);
   finalComposer.render();
 
-  debugger;
+  //debugger;
 
   
 
