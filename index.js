@@ -78,40 +78,16 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.z = 10;
 camera.position.y = 2;
 
-const light = new DirectionalLight({color: 0xFFFFFF,
-                                    intensity: .0001,
-                                   });
-
-// const light = new AmbientLight({color: 0xFFFFFF,
-//                                     intensity: .01,
+// const light = new DirectionalLight({color: 0xFFFFFF,
+//                                     intensity: .0001,
 //                                    });
+
+const light = new AmbientLight({color: 0xFFFFFF,
+                                    intensity: .01,
+                                   });
 light.position.set(-1, 2, 4);
-scene.add(light);
+//scene.add(light);
 
-// const spot = new SpotLight({color: 0xFFFFFF});
-// spot.position.set(0, 3, 7);
-// spot.intensity = 2;
-// spot.castShadow = true;
-//scene.add(spot);
-
-// const point_light = new PointLight({color: 0xFFFFFF});
-// point_light.position.set(0, 3, 7);
-// point_light.intensity = 2;
-// point_light.castShadow = true;
-// scene.add(point_light);
-
-// const point_helper = new PointLightHelper(point_light);
-//scene.add(point_helper);
-//
-
-
-// const bloomPass = new BloomPass(
-//     1,    // strength
-//     25,   // kernel size
-//     4,    // sigma ?
-//     512,  // blur render target resolution
-// );
-// composer.addPass(bloomPass);
 
 const bloomPass = new UnrealBloomPass(
   // what are these params?
@@ -128,13 +104,6 @@ const bloomComposer = new EffectComposer(renderer);
 bloomComposer.renderToScreen = false;
 bloomComposer.addPass(renderPass);
 bloomComposer.addPass(bloomPass);
-
-const vshader_bloom = document.getElementById('vshader-bloom');
-const fshader_bloom = document.getElementById('fshader-bloom');
-console.log(vshader_bloom);
-console.log(fshader_bloom);
-console.log(vshader_bloom.textContent);
-console.log(fshader_bloom.textContent);
 
 const finalPass = new ShaderPass(
   new ShaderMaterial( {
@@ -153,12 +122,24 @@ const finalComposer = new EffectComposer(renderer);
 finalComposer.addPass(renderPass);
 finalComposer.addPass(finalPass);
 
-const params = {
-  // bloom params
+
+const testPosition = new Vector3();
+const guiParams = {
+  // bloom 
   exposure: 1,
   strength: 5,
   threshold: 0,
-  radius: 0
+  radius: 0,
+
+  // test position
+  x: 0,
+  y: 0,
+  z: 0,
+
+  // lamp params
+  intensity: 0,
+  distance: 0,
+  decay: 0,
 };
 
 // gui helpers
@@ -175,52 +156,76 @@ class ColorGUIHelper {
   }
 }
 
-function makeXYZGUI(gui, vector3, name, onChangeFn) {
+
+function makeGUILamp(gui, lamp, name) {
   const folder = gui.addFolder(name);
-  folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
-  folder.add(vector3, 'y', 0, 10).onChange(onChangeFn);
-  folder.add(vector3, 'z', -10, 10).onChange(onChangeFn);
+  guiParams.x = lamp.position.x;
+  guiParams.y = lamp.position.y;
+  guiParams.z = lamp.position.z;
+  guiParams.intensity = lamp.point_light.intensity;
+  guiParams.decay = lamp.point_light.decay;
+  guiParams.distance = lamp.point_light.distance;
+  folder.add(guiParams, 'x', -10, 10).onChange(
+    function ( value ) {
+      lamp.moveTo(new Vector3(Number( value ), guiParams.y, guiParams.z));
+      console.log(lamp);
+    } );
+  folder.add(guiParams, 'y', -10, 10).onChange(
+    function ( value ) {
+      lamp.moveTo(new Vector3(guiParams.x, Number(value), guiParams.z));
+    } );
+  folder.add(guiParams, 'z', -10, 10).onChange(
+    function ( value ) {
+      lamp.moveTo(new Vector3(guiParams.x, guiParams.y, Number(value)));
+    } );
+  folder.add(guiParams, 'intensity', 0, 10).onChange(
+    function ( value ) {
+      lamp.point_light.intensity = Number(value);
+    } );
+  folder.add(guiParams, 'distance', 0, 10).onChange(
+    function ( value ) {
+      lamp.point_light.distance = Number(value);
+    } );
+  folder.add(guiParams, 'decay', 0, 10).onChange(
+    function ( value ) {
+      lamp.point_light.decay = Number(value);
+    } );
   folder.open();
 }
 
-function dummy() {
-
-}
 
 // gui.addColor(new ColorGUIHelper(point_light, 'color'), 'value').name('color');
 // 
 // gui.add(point_light, 'intensity', 0, 2, 0.01);
-// makeXYZGUI(gui, point_light.position, 'position', dummy);
 
 
 // gui for post proessing
 {
   const folder = gui.addFolder('bloom');
-  folder.add( params, 'exposure', 0.1, 2.0 ).onChange(
+  folder.add( guiParams, 'exposure', 0.1, 2.0 ).onChange(
     function ( value ) {
       // not sure if this is doing anything rn
       renderer.toneMappingExposure = Math.pow( value, 4.0 );
     } );
 
-  folder.add( params, 'strength', 0.0, 3.0 ).onChange(
+  folder.add( guiParams, 'strength', 0.0, 3.0 ).onChange(
     function ( value ) {
       console.log('changing strength');
       bloomPass.strength = Number( value );
     } );
 
-  folder.add( params, 'threshold', 0.0, 1.0 ).onChange(
+  folder.add( guiParams, 'threshold', 0.0, 1.0 ).onChange(
     function ( value ) {
       bloomPass.threshold = Number( value );
     } );
 
-  folder.add( params, 'radius', 0.0, 1.0 ).onChange(
+  folder.add( guiParams, 'radius', 0.0, 1.0 ).onChange(
     function ( value ) {
       bloomPass.radius = Number( value );
     } );
 
   folder.open();
 }
-
 
 
 class Lamp {
@@ -235,11 +240,13 @@ class Lamp {
   // <scene> is the threejs scene
   constructor(position, scene) {
 
-    const point_light = new PointLight({color: 0xFFFFFF});
-    point_light.position.set(position);
-    point_light.intensity = 2;
-    point_light.castShadow = true;
+    const point_light = new PointLight(0xFFFFFF, 5, 8, 3);
+    console.log(point_light);
+    point_light.position.copy(position);
+    // point_light.intensity = 2;
+    // point_light.castShadow = true;
     scene.add(point_light);
+    this.point_light = point_light;
 
     const sphere_geo = new IcosahedronGeometry(.3, 15);
     const sphere_mat = new MeshBasicMaterial( {color: 0xff6714});
@@ -247,9 +254,22 @@ class Lamp {
     sphere.position.copy(position);
     scene.add(sphere);
     sphere.layers.enable(BLOOM_LAYER);
+    this.sphere = sphere;
+
+    this.position = position;
+  }
+
+  // <position> is a Vector3
+  moveTo(position) {
+    this.point_light.position.copy(position);
+    this.sphere.position.copy(position);
+    this.position = position;
   }
 
   update() {
+    // a hack
+    this.point_light.position.copy(position);
+    this.sphere.position.copy(position);
   }
 
 
@@ -295,7 +315,6 @@ class Person {
     const plane_material = new MeshLambertMaterial({
       transparent: true,
       side: DoubleSide, 
-      flatShading: true, 
       map: map} );
 
     const plane = new Mesh( plane_geometry, plane_material);
@@ -463,7 +482,6 @@ function renderFrame(now) {
 
   greta.update()
 
-
   bloomComposer.setSize(canvas.width, canvas.height);
   finalComposer.setSize(canvas.width, canvas.height);
   //renderer.render(scene, camera);
@@ -484,6 +502,7 @@ function renderFrame(now) {
 
 //var char;
 var greta;
+var testlamp;
 function main() {
   var frag_shader = document.querySelector("#fragment-shader-pixel-grass").text;
   //console.log(frag_shader);
@@ -497,9 +516,12 @@ function main() {
   tex.wrapT = RepeatWrapping;
   tex.repeat.set(60, 60);
   const ground_geo = new PlaneGeometry( 100, 100 );
-  const ground_mat = new MeshLambertMaterial({
-    map: tex
+  const ground_mat = new MeshPhongMaterial({
+    map: tex,
+    shininess: 0,
+    specular: 0x000000,
   });
+  console.log(ground_mat);
 
   ground = new Mesh(ground_geo, ground_mat);
   ground.rotateX(-Math.PI / 2);
@@ -525,6 +547,13 @@ function main() {
   position = new Vector3(5, 2, -28);
   lamp = new Lamp(position, scene);
 
+  const testposition = new Vector3(2, 2, 2);
+  testlamp = new Lamp(testposition, scene);
+  makeGUILamp(gui, testlamp, 'lamp position');
+  console.log(testlamp);
+  // testlamp.moveTo(new Vector3(2, 1, 2));
+
+  // const cube = addDebugCube(scene, new Vector3(0, 5, 0));
 
   requestAnimationFrame(renderFrame);
 }
@@ -537,13 +566,14 @@ function onMouseMove(event) {
 
 function addDebugCube(scene, worldCoords) {
 
-  const geometry = new BoxGeometry(1, 1, 1);
+  const geometry = new BoxGeometry(2, 2, 2);
   const material = new MeshPhongMaterial( { color: 0xffff00} );
   const cube = new Mesh( geometry, material );
 
-
   cube.position.copy(worldCoords);
   scene.add(cube);
+
+  return cube;
 
 }
 

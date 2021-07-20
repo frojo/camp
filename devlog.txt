@@ -11,8 +11,11 @@ maybe try to  make some fireflies or a little fire
 try some custom shaders?
 LuminosityShader
 
-maybe later:
+add the lens flare from this
+https://threejs.org/examples/#webgl_lensflares
+or not the lens flare, but the spikey light thing, you know
 
+later:
 camera: follows character, and at a better angle/position
 dialog/text
 maybe just a spot light somewhere
@@ -22,6 +25,22 @@ trees?
 resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+
+# 7/20
+
+going to keep trying to make these lights look nice
+
+lower light
+
+ok the new mystery is why does the point light cast more light when its farther away?
+maybe the params i'm using are weird
+or maybe the ground plane is werid bc of my texture?/ i dont think so though..
+
+oh hm so maybe using lambert with big objects does'nt really work https://stackoverflow.com/questions/22204264/three-js-point-light-not-working-with-large-meshes
+
+whatever man, i'll just switch to phong and turn the shininess off
+
+yeah i think that looks better
 
 # 7/19
 
