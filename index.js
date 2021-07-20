@@ -88,19 +88,19 @@ const light = new DirectionalLight({color: 0xFFFFFF,
 light.position.set(-1, 2, 4);
 scene.add(light);
 
-const spot = new SpotLight({color: 0xFFFFFF});
-spot.position.set(0, 3, 7);
-spot.intensity = 2;
-spot.castShadow = true;
+// const spot = new SpotLight({color: 0xFFFFFF});
+// spot.position.set(0, 3, 7);
+// spot.intensity = 2;
+// spot.castShadow = true;
 //scene.add(spot);
 
-const point_light = new PointLight({color: 0xFFFFFF});
-point_light.position.set(0, 3, 7);
-point_light.intensity = 2;
-point_light.castShadow = true;
-scene.add(point_light);
+// const point_light = new PointLight({color: 0xFFFFFF});
+// point_light.position.set(0, 3, 7);
+// point_light.intensity = 2;
+// point_light.castShadow = true;
+// scene.add(point_light);
 
-const point_helper = new PointLightHelper(point_light);
+// const point_helper = new PointLightHelper(point_light);
 //scene.add(point_helper);
 //
 
@@ -118,7 +118,7 @@ const bloomPass = new UnrealBloomPass(
   new Vector2(window.innerWidth, window.innerHeight),
   1.5,
   0.4,
-  0.85,
+  0,
 );
 
 
@@ -187,10 +187,10 @@ function dummy() {
 
 }
 
-gui.addColor(new ColorGUIHelper(point_light, 'color'), 'value').name('color');
-
-gui.add(point_light, 'intensity', 0, 2, 0.01);
-makeXYZGUI(gui, point_light.position, 'position', dummy);
+// gui.addColor(new ColorGUIHelper(point_light, 'color'), 'value').name('color');
+// 
+// gui.add(point_light, 'intensity', 0, 2, 0.01);
+// makeXYZGUI(gui, point_light.position, 'position', dummy);
 
 
 // gui for post proessing
@@ -222,6 +222,38 @@ makeXYZGUI(gui, point_light.position, 'position', dummy);
 }
 
 
+
+class Lamp {
+  // a lamp in the world
+  //
+  // a lamp is made of:
+  //   a point light, which casts some light on objects around it
+  //   a sphere (well, ico-sphere) that has a bloom effect on it to
+  //      simulate what it looks like to look directly at a light
+  //
+  // <position> is the world position of the lamp
+  // <scene> is the threejs scene
+  constructor(position, scene) {
+
+    const point_light = new PointLight({color: 0xFFFFFF});
+    point_light.position.set(position);
+    point_light.intensity = 2;
+    point_light.castShadow = true;
+    scene.add(point_light);
+
+    const sphere_geo = new IcosahedronGeometry(.3, 15);
+    const sphere_mat = new MeshBasicMaterial( {color: 0xff6714});
+    const sphere = new Mesh(sphere_geo, sphere_mat);
+    sphere.position.copy(position);
+    scene.add(sphere);
+    sphere.layers.enable(BLOOM_LAYER);
+  }
+
+  update() {
+  }
+
+
+}
 
 
 class Person {
@@ -403,14 +435,6 @@ function makeGround(scene) {
 
 }
 
-function makeLamp(position) {
-  const point_light = new PointLight({color: 0xFFFFFF});
-  point_light.position.set(position);
-  point_light.intensity = 2;
-  point_light.castShadow = true;
-  scene.add(point_light);
-}
-
 function darkenNonBloomed(obj) {
   if (obj.isMesh && bloomLayer.test(obj.layers) == false) {
 
@@ -482,22 +506,25 @@ function main() {
   scene.add( ground );
 
 
-  // add lamps
-  // const sphere_geo = new SphereGeometry(5, 32, 32);
-  const sphere_geo = new IcosahedronGeometry(1, 15);
-  const sphere_mat = new MeshBasicMaterial( {color: 0xff6714});
-  const sphere = new Mesh(sphere_geo, sphere_mat);
-  sphere.position.set(-3, 5, -30);
-  scene.add(sphere);
-  console.log('sphere added');
-
-  sphere.layers.enable(BLOOM_LAYER);
-
-  
 
   // add greta
   greta = new Person(spr_sheet, spr_meta, scene);
   greta.teleport(new Vector3(0, 0, 6));
+
+
+  // put some lamps in the scene
+  // for (let i = 0; i < 4; i++) {
+
+  // }
+  let position = new Vector3(-5, 2, -28);
+  let lamp = new Lamp(position, scene);
+
+  position = new Vector3(0, 2, -30);
+  lamp = new Lamp(position, scene);
+
+  position = new Vector3(5, 2, -28);
+  lamp = new Lamp(position, scene);
+
 
   requestAnimationFrame(renderFrame);
 }

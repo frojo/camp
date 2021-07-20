@@ -1,12 +1,14 @@
 
 next: make some lamps
 
-copy this guys method for getting selective bloom
-https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
 
-can use threejs layers to do bloom on only certain objects?
+set the bloom params to apply it be default (lower thresh, higher strength and radius?)
+try some diff color bloom spheres?
 
-maybe can use the ShaderPass with some custom shaders too
+maybe try to  make some fireflies or a little fire
+
+
+try some custom shaders?
 LuminosityShader
 
 maybe later:
@@ -20,6 +22,13 @@ trees?
 resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+
+# 7/19
+
+yay i got bloom working. now let's actually try to make the lighting look good. my first instinct is to make a Lamp object that has some bloom effect but also a point light that lights things around it
+
+i'm realizing now that irl, you only get this bloom effect off lights in low lighting (i.e. nighttime or dusk). so unless i want to create a whole day-night cycle, i guess i'm just simulating perpetual twilight
+
 
 # 7/14
 
