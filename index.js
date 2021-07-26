@@ -82,18 +82,20 @@ camera.position.y = 2;
 //                                     intensity: .0001,
 //                                    });
 
-const light = new AmbientLight({color: 0xFFFFFF,
-                                    intensity: .01,
-                                   });
-light.position.set(-1, 2, 4);
-//scene.add(light);
+const lights = [];
+
+const ambient_light = new AmbientLight();
+ambient_light.color.set('#505870');
+ambient_light.intensity = 0.25;
+
+scene.add(ambient_light);
 
 
 const bloomPass = new UnrealBloomPass(
   // what are these params?
   new Vector2(window.innerWidth, window.innerHeight),
-  1.5,
-  0.4,
+  4.3,
+  0,
   0,
 );
 
@@ -137,9 +139,14 @@ const guiParams = {
   z: 0,
 
   // lamp params
-  intensity: 0,
+  lamp_intensity: 0,
   distance: 0,
   decay: 0,
+  lamp_color: '#ff0000',
+
+  ambient_color: '#ff0000',
+  ambient_intensity: 0,
+
 };
 
 // gui helpers
@@ -162,9 +169,6 @@ function makeGUILamp(gui, lamp, name) {
   guiParams.x = lamp.position.x;
   guiParams.y = lamp.position.y;
   guiParams.z = lamp.position.z;
-  guiParams.intensity = lamp.point_light.intensity;
-  guiParams.decay = lamp.point_light.decay;
-  guiParams.distance = lamp.point_light.distance;
   folder.add(guiParams, 'x', -10, 10).onChange(
     function ( value ) {
       lamp.moveTo(new Vector3(Number( value ), guiParams.y, guiParams.z));
@@ -178,18 +182,6 @@ function makeGUILamp(gui, lamp, name) {
     function ( value ) {
       lamp.moveTo(new Vector3(guiParams.x, guiParams.y, Number(value)));
     } );
-  folder.add(guiParams, 'intensity', 0, 10).onChange(
-    function ( value ) {
-      lamp.point_light.intensity = Number(value);
-    } );
-  folder.add(guiParams, 'distance', 0, 10).onChange(
-    function ( value ) {
-      lamp.point_light.distance = Number(value);
-    } );
-  folder.add(guiParams, 'decay', 0, 10).onChange(
-    function ( value ) {
-      lamp.point_light.decay = Number(value);
-    } );
   folder.open();
 }
 
@@ -201,16 +193,15 @@ function makeGUILamp(gui, lamp, name) {
 
 // gui for post proessing
 {
-  const folder = gui.addFolder('bloom');
+  const folder = gui.addFolder('lamps');
   folder.add( guiParams, 'exposure', 0.1, 2.0 ).onChange(
     function ( value ) {
       // not sure if this is doing anything rn
       renderer.toneMappingExposure = Math.pow( value, 4.0 );
     } );
 
-  folder.add( guiParams, 'strength', 0.0, 3.0 ).onChange(
+  folder.add( guiParams, 'strength', 0.0, 10.0 ).onChange(
     function ( value ) {
-      console.log('changing strength');
       bloomPass.strength = Number( value );
     } );
 
@@ -222,6 +213,48 @@ function makeGUILamp(gui, lamp, name) {
   folder.add( guiParams, 'radius', 0.0, 1.0 ).onChange(
     function ( value ) {
       bloomPass.radius = Number( value );
+    } );
+
+
+  // guiParams.intensity = lamp.point_light.intensity;
+  // guiParams.decay = lamp.point_light.decay;
+  // guiParams.distance = lamp.point_light.distance;
+  folder.add(guiParams, 'lamp_intensity', 0, 10.0).onChange(
+    function ( value ) {
+      lights.forEach(lamp => lamp.point_light.intensity = Number(value));
+      console.log('intensity = ' + Number(value));
+    } );
+  folder.add(guiParams, 'distance', 0, 100).onChange(
+    function ( value ) {
+      lights.forEach(lamp => lamp.point_light.distance = Number(value));
+      console.log('distance = ' + Number(value));
+    } );
+  folder.add(guiParams, 'decay', 0, 10).onChange(
+    function ( value ) {
+      lights.forEach(lamp => lamp.point_light.decay = Number(value));
+      console.log('decay = ' + Number(value));
+    } );
+  folder.addColor( guiParams, 'lamp_color').onChange(
+    function ( value ) {
+      lights.forEach(lamp => lamp.point_light.color.set(value));
+      lights.forEach(lamp => lamp.sphere.material.color.set(value));
+      console.log('lamp color = ' + value);
+    } );
+
+  folder.open();
+}
+
+{
+  const folder = gui.addFolder('ambient light');
+  folder.add(guiParams, 'ambient_intensity', 0.0, 1.0).onChange(
+    function ( value ) {
+      ambient_light.intensity = Number( value );
+      console.log('ambient intensity = ' + Number(value));
+    } );
+
+  folder.addColor( guiParams, 'ambient_color').onChange(
+    function ( value ) {
+      ambient_light.color.set( value );
     } );
 
   folder.open();
@@ -240,7 +273,12 @@ class Lamp {
   // <scene> is the threejs scene
   constructor(position, scene) {
 
-    const point_light = new PointLight(0xFFFFFF, 5, 8, 3);
+    const point_light = new PointLight(0xffa429);  // color
+                                      //ff8535
+                                      //ffa429
+    point_light.intensity = 2.5;
+    point_light.distance = 17;
+    point_light.decay = 2;
     console.log(point_light);
     point_light.position.copy(position);
     // point_light.intensity = 2;
@@ -248,7 +286,7 @@ class Lamp {
     scene.add(point_light);
     this.point_light = point_light;
 
-    const sphere_geo = new IcosahedronGeometry(.3, 15);
+    const sphere_geo = new IcosahedronGeometry(.2, 15);
     const sphere_mat = new MeshBasicMaterial( {color: 0xff6714});
     const sphere = new Mesh(sphere_geo, sphere_mat);
     sphere.position.copy(position);
@@ -257,6 +295,8 @@ class Lamp {
     this.sphere = sphere;
 
     this.position = position;
+
+    lights.push(this);
   }
 
   // <position> is a Vector3
@@ -538,18 +578,18 @@ function main() {
   // for (let i = 0; i < 4; i++) {
 
   // }
-  let position = new Vector3(-5, 2, -28);
+  let position = new Vector3(-5, 5, -28);
   let lamp = new Lamp(position, scene);
 
-  position = new Vector3(0, 2, -30);
+  position = new Vector3(0, 5, -30);
   lamp = new Lamp(position, scene);
 
-  position = new Vector3(5, 2, -28);
+  position = new Vector3(5, 5, -28);
   lamp = new Lamp(position, scene);
 
-  const testposition = new Vector3(2, 2, 2);
+  const testposition = new Vector3(2, 5, 2);
   testlamp = new Lamp(testposition, scene);
-  makeGUILamp(gui, testlamp, 'lamp position');
+  makeGUILamp(gui, testlamp, 'test lamp');
   console.log(testlamp);
   // testlamp.moveTo(new Vector3(2, 1, 2));
 

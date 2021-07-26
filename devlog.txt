@@ -1,30 +1,31 @@
 
-next: make some lamps
+next: still tweaking lighting
 
 
-set the bloom params to apply it be default (lower thresh, higher strength and radius?)
-try some diff color bloom spheres?
-
-maybe try to  make some fireflies or a little fire
-
-
-try some custom shaders?
-LuminosityShader
-
-add the lens flare from this
-https://threejs.org/examples/#webgl_lensflares
-or not the lens flare, but the spikey light thing, you know
 
 later:
 camera: follows character, and at a better angle/position
 dialog/text
-maybe just a spot light somewhere
-fireflies/fire/some lighting
+maybe try to  make some fireflies or a little fire
 ooo myabe some stars
 trees?
 resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
 multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/1417860643890208768?s=20
+maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
+
+# 7/22
+
+i think more light tweaking lol this takes forever
+
+ok i think i got it to where i want it. time to do something else
+
+do i want to make content now.... yeah i think lets go for a small story now and that can guide the next features that i make
+
+# 7/21
+
+i'll spend a little more time tweaking the lights... but i'm preeety happy with them??
 
 # 7/20
 
