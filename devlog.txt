@@ -1,11 +1,13 @@
 
-next: still tweaking lighting
+next: resizing the window should resize the canvas
+
+after get the camera to work, will probably have to redo the resizing code
 
 
 
 later:
 camera: follows character, and at a better angle/position
-dialog/text
+dialog/text (look at some threejsfundamentals articles including this one https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html )
 maybe try to  make some fireflies or a little fire
 ooo myabe some stars
 trees?
@@ -14,6 +16,41 @@ multiplayer
 better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/1417860643890208768?s=20
 maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
+
+# 7/28
+
+getting window resizing to work
+
+i think i need an event listener on window resizing?
+
+
+# 7/23
+
+ok no more light tweaking for now, let's work on something else
+
+maybe it's time to implement canvas window resize
+
+what was i excited about the other day? oh yeah being able to interact with different objects and craft things
+smoking cigarettes - the butts dont go away
+making drugs from tree sap
+someone to welcome you - some jawa type looking person with a hood
+text chat a la runescape or likelik2d
+dust particles that you have to sweep away
+minimal or no HUD
+
+yeah maybe what i want to do next is just get it online. i think that'll shape what it becomes going forward
+
+first lets fix window resizing
+and a first try at camera behavior
+
+and then we'll get it up live
+maybe multiplayer????? maaaaaaybe
+
+a passage from the bible: https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
+
+i think what we ultimately want is no matter what the size of the window, or if the user resizes etc, the camera is centered on the player. (or somewhat-centered, maybe its centered on the middle of the camera bounds)
+
+
 
 # 7/22
 

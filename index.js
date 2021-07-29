@@ -63,7 +63,7 @@ scene.fog = new Fog(bg_color, 10, 100);
 const camera = new PerspectiveCamera(
   75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-const canvas = document.querySelector('canvas');
+const canvas = document.getElementById('world');
 const renderer = new WebGLRenderer({canvas});
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -510,9 +510,59 @@ function restoreMaterial(obj) {
 
 }
 
+// matches the "drawingbuffer" size (i.e. internal pixel resolution) of the
+// canvas to the size of the canvas in actual pixels of user screen space
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+    console.log(canvas.width);
+
+    // we have to resize this stuff for postprocessing effects
+    // todo: should this be clientWidth, or just width etc.?
+    bloomComposer.setSize(canvas.width, canvas.height);
+    finalComposer.setSize(canvas.width, canvas.height);
+  }
+
+  return needResize;
+}
+
+function onResize() {
+  console.log('resize!');
+  console.log(window.innerWidth);
+
+  const canvas = renderer.domElement;
+
+  // resize canvas to window size
+  console.log(window.innerWidth);
+  canvas.width = window.innerWidth;
+  console.log(canvas.width);
+  canvas.height = window.innerHeight;
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+
+  // match the drawingbuffer size to the display size
+  renderer.setSize(canvas.width, canvas.height, false);
+
+  // we have to resize this stuff for postprocessing effects
+  // todo: should this be clientWidth, or just width etc.?
+  bloomComposer.setSize(canvas.width, canvas.height);
+  finalComposer.setSize(canvas.width, canvas.height);
+
+  // update camera aspect ratio
+  camera.aspect = canvas.clientWidth / canvas.clientHeight;
+  camera.updateProjectionMatrix();
+
+}
+
 var ground;
 
-// this is the main render loop
+// this is the main render loop (and also update loop)
+
 let then = 0;
 function renderFrame(now) {
   // variable framerate
@@ -522,19 +572,25 @@ function renderFrame(now) {
 
   greta.update()
 
-  bloomComposer.setSize(canvas.width, canvas.height);
-  finalComposer.setSize(canvas.width, canvas.height);
-  //renderer.render(scene, camera);
-  //bloomComposer.render();
 
+  // resize canvas if window size has changed
+  // if (resizeRendererToDisplaySize(renderer)) {
+  //   const canvas = renderer.domElement;
+  //   camera.aspect = canvas.clientWidth / canvas.clientHeight;
+  //   camera.updateProjectionMatrix();
+
+  //   // we have to resize this stuff for postprocessing effects
+  //   bloomComposer.setSize(canvas.width, canvas.height);
+  //   finalComposer.setSize(canvas.width, canvas.height);
+  // }
+
+
+  // technique copied from
+  // https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
   scene.traverse(darkenNonBloomed);
   bloomComposer.render();
   scene.traverse(restoreMaterial);
   finalComposer.render();
-
-  //debugger;
-
-  
 
 
   requestAnimationFrame(renderFrame);
@@ -639,6 +695,8 @@ function onClick(event) {
 
 window.addEventListener('mousemove', onMouseMove, false);
 window.addEventListener('click', onClick, false);
+window.addEventListener('resize', onResize, false);
+
 
 main();
 
