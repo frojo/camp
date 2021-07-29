@@ -510,53 +510,27 @@ function restoreMaterial(obj) {
 
 }
 
-// matches the "drawingbuffer" size (i.e. internal pixel resolution) of the
-// canvas to the size of the canvas in actual pixels of user screen space
-function resizeRendererToDisplaySize(renderer) {
-  const canvas = renderer.domElement;
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-
-  const needResize = canvas.width !== width || canvas.height !== height;
-  if (needResize) {
-    renderer.setSize(width, height, false);
-    console.log(canvas.width);
-
-    // we have to resize this stuff for postprocessing effects
-    // todo: should this be clientWidth, or just width etc.?
-    bloomComposer.setSize(canvas.width, canvas.height);
-    finalComposer.setSize(canvas.width, canvas.height);
-  }
-
-  return needResize;
-}
-
 function onResize() {
-  console.log('resize!');
-  console.log(window.innerWidth);
-
   const canvas = renderer.domElement;
 
   // resize canvas to window size
-  console.log(window.innerWidth);
   canvas.width = window.innerWidth;
-  console.log(canvas.width);
   canvas.height = window.innerHeight;
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
+  canvas.style.width = canvas.width + 'px';
+  canvas.style.height = canvas.height + 'px';
 
-  // match the drawingbuffer size to the display size
+  // match the "drawingbuffer" size (i.e. internal pixel resolution) of 
+  // the canvas to the size of the canvas in actual pixels of user
+  // screen space
   renderer.setSize(canvas.width, canvas.height, false);
 
-  // we have to resize this stuff for postprocessing effects
-  // todo: should this be clientWidth, or just width etc.?
+  // we have to resize this stuff too for postprocessing effects
   bloomComposer.setSize(canvas.width, canvas.height);
   finalComposer.setSize(canvas.width, canvas.height);
 
   // update camera aspect ratio
   camera.aspect = canvas.clientWidth / canvas.clientHeight;
   camera.updateProjectionMatrix();
-
 }
 
 var ground;
@@ -571,19 +545,6 @@ function renderFrame(now) {
 
 
   greta.update()
-
-
-  // resize canvas if window size has changed
-  // if (resizeRendererToDisplaySize(renderer)) {
-  //   const canvas = renderer.domElement;
-  //   camera.aspect = canvas.clientWidth / canvas.clientHeight;
-  //   camera.updateProjectionMatrix();
-
-  //   // we have to resize this stuff for postprocessing effects
-  //   bloomComposer.setSize(canvas.width, canvas.height);
-  //   finalComposer.setSize(canvas.width, canvas.height);
-  // }
-
 
   // technique copied from
   // https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
