@@ -1,21 +1,65 @@
 
-next: resizing the window should resize the canvas
+next: better camera
+
+- follow the player - probably a some soft limits
+- use some analog controls to get the right height/angle
+- zoom?
 
 after get the camera to work, will probably have to redo the resizing code
+
+params to tweak:
+- camera offset from player
+- camera angle
+- window width and length
 
 
 
 later:
-camera: follows character, and at a better angle/position
-dialog/text (look at some threejsfundamentals articles including this one https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html )
-maybe try to  make some fireflies or a little fire
-ooo myabe some stars
-trees?
-resize canvas on window resize https://threejsfundamentals.org/threejs/lessons/threejs-responsive.html
-multiplayer
-better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
+- camera: follows character, and at a better angle/position
+- dialog/text (look at some threejsfundamentals articles including this one https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html )
+- maybe try to  make some fireflies or a little fire
+- ooo myabe some stars
+- trees?
+- multiplayer
+- better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/1417860643890208768?s=20
-maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
+- maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
+
+# 7/30
+
+lets implement some camera follow
+
+honestly just keeping the player centered is pretty nice
+maybe the window could be a circle?
+
+# 7/29
+
+yay resizing works. the technique of "if its taking a lot of time and sweat to get the last 5% just leave it to the next day when you're fresh" has worked a couple times now
+
+ok now lets get camera working. i want the camera to follow the player, but not always have the player exactly centered (like in runescape). like some soft limits, like in mario 2d platformers.
+
+i wonder what would happen if the player can rotate the camera... but i like the limitation that they can't, probably easier to design spaces. but can the player zoom? that would be nice
+
+this video is interesting https://www.youtube.com/watch?v=pdvCO97jOQk
+wow he's talking about eye-brain anatomy damn
+
+o one interesting point from this vid is that the camera-window technique makes it harder to see where you're going
+maybe can see how it works with window horizontal/ locking vertical or vice versa
+could lerp-smooth too...
+o and some manual control? with the mouse? like can sort of look to the left or right? that could be pretty cool
+o hm the speedup-push-zone is pretty interesting for smoothing camera
+
+o could even play with ease in and ease out when you're on drugs
+
+could switch camera based on which /direction/ i'm walking
+~21:00 is when he starts talking about some wild stuff
+
+messing with the camera manually to set up certain scenes seems like a good idea too (32:00 when he's talk about limbo/aether)
+or even doing things with the cam for certain interactions... zoom in when tapping a tree.?
+
+
+ok let's implement something. I think i'll start with a "simple" window
+
 
 # 7/28
 

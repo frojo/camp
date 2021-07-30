@@ -60,8 +60,14 @@ const scene = new Scene();
 const bg_color = new Color('black');
 scene.background = bg_color;
 scene.fog = new Fog(bg_color, 10, 100);
+
+
+
 const camera = new PerspectiveCamera(
   75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+var camWindowCenter = new Vector3(0, 0, 0);
+var camOffset = new Vector3(0, 0, 0);
 
 const canvas = document.getElementById('world');
 const renderer = new WebGLRenderer({canvas});
@@ -74,9 +80,6 @@ controls.mouseButtons =  {
 controls.enablePan = true;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-
-camera.position.z = 10;
-camera.position.y = 2;
 
 // const light = new DirectionalLight({color: 0xFFFFFF,
 //                                     intensity: .0001,
@@ -241,7 +244,7 @@ function makeGUILamp(gui, lamp, name) {
       console.log('lamp color = ' + value);
     } );
 
-  folder.open();
+  // folder.open();
 }
 
 {
@@ -257,8 +260,10 @@ function makeGUILamp(gui, lamp, name) {
       ambient_light.color.set( value );
     } );
 
-  folder.open();
+  // folder.open();
 }
+
+// gui.close();
 
 
 class Lamp {
@@ -533,6 +538,43 @@ function onResize() {
   camera.updateProjectionMatrix();
 }
 
+// this is called every frame to position the camera based on where
+// the player is moving
+//
+// the way this works is the player can move in a rectangular "window"
+// in front of the camera. if the player starts to move outside of
+// this window, they will "push" the camera in that direction
+function cameraFollow(cam, playerPos) {
+
+  const camWindowWidth = 5;
+  const camWindowLength = 5;
+
+  const rightBound = camWindowCenter.x + camWindowWidth / 2;
+  const leftBound = camWindowCenter.x - camWindowWidth / 2;
+  const nearBound = camWindowCenter.z + camWindowLength / 2;
+  const farBound = camWindowCenter.z - camWindowLength / 2;
+  
+  if (playerPos.x > rightBound) {
+    const diff = playerPos.x - rightBound;
+    camWindowCenter.x += diff;
+  }
+  if (playerPos.x < leftBound) {
+    const diff = playerPos.x - leftBound;
+    camWindowCenter.x += diff;
+  }
+  if (playerPos.z < farBound) {
+    const diff = playerPos.z - farBound;
+    camWindowCenter.z += diff;
+  }
+  if (playerPos.z > nearBound) {
+    const diff = playerPos.z - nearBound;
+    camWindowCenter.z += diff;
+  }
+
+  cam.position.addVectors(camWindowCenter, camOffset);
+
+}
+
 var ground;
 
 // this is the main render loop (and also update loop)
@@ -545,6 +587,8 @@ function renderFrame(now) {
 
 
   greta.update()
+
+  cameraFollow(camera, greta.position);
 
   // technique copied from
   // https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
@@ -561,9 +605,6 @@ function renderFrame(now) {
 var greta;
 var testlamp;
 function main() {
-  var frag_shader = document.querySelector("#fragment-shader-pixel-grass").text;
-  //console.log(frag_shader);
-
 
   // make ground plane
   const tex = new TextureLoader().load(ground_tex);
@@ -611,6 +652,13 @@ function main() {
   // testlamp.moveTo(new Vector3(2, 1, 2));
 
   // const cube = addDebugCube(scene, new Vector3(0, 5, 0));
+  //
+  // set up things for camera and position it initially
+  camWindowCenter.copy(greta.position);
+  camOffset = new Vector3(0, 2, 6);
+
+  // set cam to initial position
+  camera.position.addVectors(camWindowCenter, camOffset);
 
   requestAnimationFrame(renderFrame);
 }
