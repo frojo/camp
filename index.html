@@ -11,12 +11,37 @@
         height: 100%;
         display: block;
       }
+
+      #container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #text-boxes {
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: white;
+      }
+
+      .text-box {
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: white;
+        background-color: black;
+      }
     
     </style>
   
   </head>
   <body>
-    <canvas id="world"></canvas>
+    <div id="container">
+      <canvas id="world"></canvas>
+      <div id="text-boxes"></div>
+    </div>
   </body>
   <script id="vertex-shader-2d" type="notjs">
     // so now we're assuming this is pixel position on screen

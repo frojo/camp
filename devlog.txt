@@ -1,29 +1,56 @@
 
-next: better camera
+next: text
 
-- follow the player - probably a some soft limits
-- use some analog controls to get the right height/angle
-- zoom?
+texttttttttttttttttt
 
-after get the camera to work, will probably have to redo the resizing code
 
-params to tweak:
-- camera offset from player
-- camera angle
-- window width and length
+starting here https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html
+
+using HTML elements in the scene..
 
 
 
 later:
-- camera: follows character, and at a better angle/position
 - dialog/text (look at some threejsfundamentals articles including this one https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html )
 - maybe try to  make some fireflies or a little fire
 - ooo myabe some stars
 - trees?
+- putting it online
 - multiplayer
+- hold left-click to move
+- camera: try differnt heights and/or angles
+- camera: scroll to zoom in or out
 - better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/1417860643890208768?s=20
 - maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
+
+
+# 8/10
+
+ok let's tweak the camera
+
+i think it's time to get this to a releasable state... i just am getting bored of it. or maybe i just need to get back into it. idk. anyway lets tweak camera things
+
+i like the simple camera window. now it's time to get the right window size/placement and camera height/angle. maybe the right settings will be dependent on what is in the actual game, but already there's some things that i want to set. like the window limit taht is closest to the camera shouldn't be too close, or else the player will have a hard time seeing where they're going
+
+either way, i'll add some gui controls for these values
+
+ok got some better window bounds. i do still want to tweak the camera height and angle... but i think for now it's fine actually. that's like a future todo
+
+ok.. now do i want a character you can talk to? or multiplayer?
+i think putting it online would make more excited to work on it... maybe i should do that first
+
+nah i'm gonna do text box first. i'm excited about it
+and of course if i do text box, i need a character
+i'll probably have dialog text boxes, and then like narrator text boxes....
+
+i imagine white Times New Roman on a black box. like Instagram. or darwin. or Old Films. would be interesting to see where this aesthetic comes from
+
+i'm going back to the bible and using this article https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html
+
+i either want to use a texture with 2D text (using the cnavas) or use HTML elements... not really sure what i'll like better but using HTML elements sounds cool and webby
+
+it works. next time i can position it 
 
 # 7/30
 

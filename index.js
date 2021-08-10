@@ -41,8 +41,6 @@ import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass
 import {ShaderPass} from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
 import { GUI } from 'dat.gui';
 
 const BASE_LAYER = 0, BLOOM_LAYER = 1;
@@ -69,15 +67,15 @@ const camera = new PerspectiveCamera(
 var camWindowCenter = new Vector3(0, 0, 0);
 var camOffset = new Vector3(0, 0, 0);
 
+// camera settings
+var camFarBoundOffset =1.9;
+var camNearBoundOffset = 0.5;
+var camRightBoundOffset = 2;
+var camLeftBoundOffset = 2;
+
 const canvas = document.getElementById('world');
 const renderer = new WebGLRenderer({canvas});
 
-const controls = new OrbitControls(camera, renderer.domElement);
-
-controls.mouseButtons =  {
-  ORBIT : MOUSE.RIGHT
-}
-controls.enablePan = true;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -147,8 +145,16 @@ const guiParams = {
   decay: 0,
   lamp_color: '#ff0000',
 
+  // ambient light params
   ambient_color: '#ff0000',
   ambient_intensity: 0,
+
+  // camera params
+  camFarBound: camFarBoundOffset,
+  camNearBound: camNearBoundOffset,
+  camLeftBound: camLeftBoundOffset,
+  camRightBound: camRightBoundOffset,
+
 
 };
 
@@ -247,6 +253,7 @@ function makeGUILamp(gui, lamp, name) {
   // folder.open();
 }
 
+// ambient light settings
 {
   const folder = gui.addFolder('ambient light');
   folder.add(guiParams, 'ambient_intensity', 0.0, 1.0).onChange(
@@ -261,6 +268,34 @@ function makeGUILamp(gui, lamp, name) {
     } );
 
   // folder.open();
+}
+
+{
+  const folder = gui.addFolder('camera');
+  folder.add(guiParams, 'camFarBound', 0.0, 10.0).onChange(
+    function ( value ) {
+      camFarBoundOffset = Number(value);
+      console.log('cam far bound = ' + Number(value));
+    } );
+  folder.add(guiParams, 'camNearBound', 0.0, 10.0).onChange(
+    function ( value ) {
+      camNearBoundOffset = Number(value);
+      console.log('cam far bound = ' + Number(value));
+    } );
+  folder.add(guiParams, 'camLeftBound', 0.0, 10.0).onChange(
+    function ( value ) {
+      camLeftBoundOffset = Number(value);
+      console.log('cam far bound = ' + Number(value));
+    } );
+  folder.add(guiParams, 'camRightBound', 0.0, 10.0).onChange(
+    function ( value ) {
+      camRightBoundOffset = Number(value);
+      console.log('cam far bound = ' + Number(value));
+    } );
+
+
+
+  folder.open();
 }
 
 // gui.close();
@@ -546,13 +581,10 @@ function onResize() {
 // this window, they will "push" the camera in that direction
 function cameraFollow(cam, playerPos) {
 
-  const camWindowWidth = 5;
-  const camWindowLength = 5;
-
-  const rightBound = camWindowCenter.x + camWindowWidth / 2;
-  const leftBound = camWindowCenter.x - camWindowWidth / 2;
-  const nearBound = camWindowCenter.z + camWindowLength / 2;
-  const farBound = camWindowCenter.z - camWindowLength / 2;
+  const rightBound = camWindowCenter.x + camRightBoundOffset;
+  const leftBound = camWindowCenter.x - camLeftBoundOffset;
+  const nearBound = camWindowCenter.z + camNearBoundOffset;
+  const farBound = camWindowCenter.z - camFarBoundOffset;
   
   if (playerPos.x > rightBound) {
     const diff = playerPos.x - rightBound;
@@ -659,6 +691,13 @@ function main() {
 
   // set cam to initial position
   camera.position.addVectors(camWindowCenter, camOffset);
+
+  // add some text
+  const textBoxes = document.querySelector('#text-boxes');
+  const text_box = document.createElement('div');
+  text_box.className = 'text-box';
+  text_box.textContent = 'helllooooooo';
+  textBoxes.appendChild(text_box);
 
   requestAnimationFrame(renderFrame);
 }
