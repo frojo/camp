@@ -12,17 +12,40 @@ using HTML elements in the scene..
 
 later:
 - dialog/text (look at some threejsfundamentals articles including this one https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html )
+- just a another person to talk to that is like "there's not much to see here yet... sorry :)" maybe they're on a computer
+- make sure it works one mobile
+- putting it online
+- multiplayer
 - maybe try to  make some fireflies or a little fire
 - ooo myabe some stars
 - trees?
-- putting it online
-- multiplayer
 - hold left-click to move
 - camera: try differnt heights and/or angles
 - camera: scroll to zoom in or out
 - better ground texture with render target? https://threejsfundamentals.org/threejs/lessons/threejs-rendertargets.html
 VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/1417860643890208768?s=20
 - maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
+- populate the landscape with some trees
+- write some wrapper code around GUI to make it quick to set up controls for arbitrary params
+
+# 8/11
+
+ok so what do i even want to do with text... i want to:
+- have dialogue textboxes when you talk to npcs
+- have "narrator" textboxes for describing things
+- let the player chat
+
+
+lets do narrator textbox first because that seems easiest
+i just want like a black rectangle with white Times new roman text on it
+default as hell
+
+ugh CSS. why is the text box breaking at lines instead of just expanding to the right?
+
+also if i set the max-width to 100%, there's no longer a background color??
+
+oh wait so it's setting the width to the size of the biggest word...
+if i set max-width to 100%, that makes the width 0
 
 
 # 8/10

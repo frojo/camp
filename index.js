@@ -298,7 +298,7 @@ function makeGUILamp(gui, lamp, name) {
   folder.open();
 }
 
-// gui.close();
+gui.close();
 
 
 class Lamp {
@@ -696,7 +696,16 @@ function main() {
   const textBoxes = document.querySelector('#text-boxes');
   const text_box = document.createElement('div');
   text_box.className = 'text-box';
-  text_box.textContent = 'helllooooooo';
+  text_box.textContent = 'you find yourself in a desolate plane of werewrwerexistence. it\'s always twilight here';
+
+
+  const x = canvas.clientWidth * .5;
+  const y = canvas.clientHeight * .5;
+
+  // centers the text on x, y
+  text_box.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+
+  
   textBoxes.appendChild(text_box);
 
   requestAnimationFrame(renderFrame);
