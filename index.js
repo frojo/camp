@@ -607,6 +607,29 @@ function cameraFollow(cam, playerPos) {
 
 }
 
+function displayNarratorText(string, duration) {
+  // in index.html, we have a div container with id = text-boxes
+  const textBoxes = document.querySelector('#text-boxes');
+
+  const text_box = document.createElement('div');
+  text_box.className = 'text-box';
+  text_box.textContent = string;
+
+  const x = canvas.clientWidth * .5;
+  const y = canvas.clientHeight * .5;
+
+  text_box.style.transformOrigin = 'center center';
+
+  text_box.style.top = '10%';
+  text_box.style.left = '50%';
+
+  textBoxes.appendChild(text_box);
+
+  // todo: duration
+
+}
+
+
 var ground;
 
 // this is the main render loop (and also update loop)
@@ -692,29 +715,9 @@ function main() {
   // set cam to initial position
   camera.position.addVectors(camWindowCenter, camOffset);
 
-  // add some text
-  const textBoxes = document.querySelector('#text-boxes');
-  const text_box = document.createElement('div');
-  text_box.className = 'text-box';
-  text_box.textContent = 'you find yourself in a desolate plane of existence. it\'s always twilight here';
+  displayNarratorText('you find yourself in a desolate plane of existence. it\'s always twilight here', 10);
 
-
-  const x = canvas.clientWidth * .5;
-  const y = canvas.clientHeight * .5;
-
-  // centers the text on x, y
-  // text_box.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
-  // text_box.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
-  text_box.style.transformOrigin = 'center center';
-
-  console.log(text_box.style.transformOrigin);
-  text_box.style.top = '10%';
-  text_box.style.left = '50%';
-  console.log(text_box.style);
-
-  
-  textBoxes.appendChild(text_box);
-
+  // kick of renderloop
   requestAnimationFrame(renderFrame);
 }
 
