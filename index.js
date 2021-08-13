@@ -696,14 +696,21 @@ function main() {
   const textBoxes = document.querySelector('#text-boxes');
   const text_box = document.createElement('div');
   text_box.className = 'text-box';
-  text_box.textContent = 'you find yourself in a desolate plane of werewrwerexistence. it\'s always twilight here';
+  text_box.textContent = 'you find yourself in a desolate plane of existence. it\'s always twilight here';
 
 
   const x = canvas.clientWidth * .5;
   const y = canvas.clientHeight * .5;
 
   // centers the text on x, y
-  text_box.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+  // text_box.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+  // text_box.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+  text_box.style.transformOrigin = 'center center';
+
+  console.log(text_box.style.transformOrigin);
+  text_box.style.top = '10%';
+  text_box.style.left = '50%';
+  console.log(text_box.style);
 
   
   textBoxes.appendChild(text_box);
