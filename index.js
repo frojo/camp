@@ -1,6 +1,10 @@
 
-import spr_sheet from "./assets/char.png";
-import spr_meta from "./assets/char.json";
+import greta_sheet from "./assets/char.png";
+import greta_meta from "./assets/char.json";
+
+import keeper_sheet from "./assets/steward.png";
+import keeper_meta from "./assets/steward.json";
+
 import ground_tex from "./assets/ground.png";
 
 import { Scene, 
@@ -319,7 +323,6 @@ class Lamp {
     point_light.intensity = 2.5;
     point_light.distance = 17;
     point_light.decay = 2;
-    console.log(point_light);
     point_light.position.copy(position);
     // point_light.intensity = 2;
     // point_light.castShadow = true;
@@ -360,6 +363,9 @@ class Person {
   // our papermario/magicwand pixelart person class
   //
   // the spritesheet is a horizontal row of sprites
+  //
+  // must have an idle animation that is tagged as such
+  //
   // and it comes with a json file that has info on where the animations
   // start and end etc.
   // the JSON has to be exported by aseprite with certain export settings
@@ -367,10 +373,12 @@ class Person {
   // Array (not Hash)
   // set "Item Filename" to {tag}{tagframe}
   //
+  // <name> is a string of our person's name (e.g. 'greta')
   // <sheet_path> is a path to a spritesheet .png
   // <meta> is a object derived from the JSON produced by aseprite
   // <scene> is a reference to threejs scene
-  constructor(sheet_path, meta, scene) {
+  constructor(name, sheet_path, meta, scene) {
+    this.name = name;
     this.sheet_path = sheet_path;
     this.meta = meta;
 
@@ -618,7 +626,8 @@ function renderFrame(now) {
   then = now;
 
 
-  greta.update()
+  greta.update();
+  keeper.update();
 
   cameraFollow(camera, greta.position);
 
@@ -633,8 +642,8 @@ function renderFrame(now) {
   requestAnimationFrame(renderFrame);
 }
 
-//var char;
 var greta;
+var keeper;
 var testlamp;
 function main() {
 
@@ -660,8 +669,12 @@ function main() {
 
 
   // add greta
-  greta = new Person(spr_sheet, spr_meta, scene);
+  greta = new Person('greta', greta_sheet, greta_meta, scene);
   greta.teleport(new Vector3(0, 0, 6));
+
+  // add keeper
+  keeper = new Person('keeper', keeper_sheet, keeper_meta, scene);
+  keeper.teleport(new Vector3(2, 0, 4));
 
 
   // put some lamps in the scene
