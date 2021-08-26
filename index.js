@@ -1,6 +1,14 @@
 
-import spr_sheet from "./assets/char.png";
-import spr_meta from "./assets/char.json";
+import greta_sheet from "./assets/char.png";
+import greta_meta from "./assets/char.json";
+import greta_bloom_sheet from "./assets/char_bloom.png";
+import greta_bloom_meta from "./assets/char_bloom.json";
+
+import keeper_sheet from "./assets/steward.png";
+import keeper_meta from "./assets/steward.json";
+import keeper_bloom_sheet from "./assets/steward_bloom.png";
+import keeper_bloom_meta from "./assets/steward_bloom.json";
+
 import ground_tex from "./assets/ground.png";
 
 import { Scene, 
@@ -32,6 +40,7 @@ import { Scene,
   MOUSE,
   RepeatWrapping,
   Layers,
+  Group,
 } from 'three';
 
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -319,7 +328,6 @@ class Lamp {
     point_light.intensity = 2.5;
     point_light.distance = 17;
     point_light.decay = 2;
-    console.log(point_light);
     point_light.position.copy(position);
     // point_light.intensity = 2;
     // point_light.castShadow = true;
@@ -360,6 +368,9 @@ class Person {
   // our papermario/magicwand pixelart person class
   //
   // the spritesheet is a horizontal row of sprites
+  //
+  // must have an idle animation that is tagged as such
+  //
   // and it comes with a json file that has info on where the animations
   // start and end etc.
   // the JSON has to be exported by aseprite with certain export settings
@@ -367,10 +378,13 @@ class Person {
   // Array (not Hash)
   // set "Item Filename" to {tag}{tagframe}
   //
+  // <name> is a string of our person's name (e.g. 'greta')
   // <sheet_path> is a path to a spritesheet .png
   // <meta> is a object derived from the JSON produced by aseprite
   // <scene> is a reference to threejs scene
-  constructor(sheet_path, meta, scene) {
+  constructor(name, sheet_path, meta, 
+		    bloom_sheet_path, bloom_meta, scene) {
+    this.name = name;
     this.sheet_path = sheet_path;
     this.meta = meta;
 
@@ -391,15 +405,42 @@ class Person {
     this.map = map;
 
     // threejs obj stuff
-    const plane_geometry = new PlaneGeometry( 1, 1 );
+    const plane_geometry = new PlaneGeometry(1, 1);
     const plane_material = new MeshLambertMaterial({
       transparent: true,
       side: DoubleSide, 
       map: map} );
 
     const plane = new Mesh( plane_geometry, plane_material);
+
+    // BLOOM LAYER
+
+    // create geometry/textures and add to threejs scene
+    const bloom_map = new TextureLoader().load(bloom_sheet_path);
+    // get those crisp pixels
+    bloom_map.magFilter = NearestFilter
+    // sample one frame at a time from the sprite sheet
+    bloom_map.repeat.x = 1.0 / this.frame_num;
+    this.bloom_map = bloom_map;
+    
+    const bloom_geo = new PlaneGeometry(1, 1);
+    const bloom_plane_material = new MeshBasicMaterial({
+      transparent: true,
+      side: DoubleSide, 
+      map: bloom_map} );
+    const bloom_plane = new Mesh( bloom_geo, bloom_plane_material);
+    bloom_plane.layers.enable(BLOOM_LAYER);
+
+
+    const group = new Group();
+    this.group = group;
+    group.add(plane);
+    group.add(bloom_plane);
+    bloom_plane.position.z = plane.position.z + .001;
+
     this.plane = plane;
-    scene.add( plane );
+    scene.add(group);
+    // scene.add(bloom_plane);
 
     // our internal world position tracker
     this.position = new Vector3(0, .5, 0);
@@ -410,15 +451,21 @@ class Person {
 
     this.startAnim('idle');
 
+
   }
 
   // anim is a string that is an id for the anim e.g. "walk"
   startAnim(anim) {
+    console.log('starting ' + anim + ' anim for ' + this.name);
     let tags = this.meta.meta.frameTags;
+    console.log(this.meta);
+
 
     const anim_info = tags.find(function(value) {
       return value.name == anim;
     });
+
+    console.log(anim_info);
 
     if (!anim_info) {
       console.log('ERROR: no animation with that tag!!');
@@ -427,6 +474,12 @@ class Person {
 
     this.start_i = anim_info.from;
     this.end_i = anim_info.to;
+
+    // calculate total duration for this animation
+    // (we need this for animating)
+    //
+    this.meta.frames
+    //this.anim_total_dur = something;
   }
 
   // <target> is Vector3 world coords on the ground plane 
@@ -454,6 +507,7 @@ class Person {
     // determine which frame we're on
     const t_ms = Date.now();
     const num_frames = this.end_i - this.start_i + 1;
+    // const total_dur = soemthing;
 
     // assume for now that every frame lasts for 200ms
     const frame_dur = 200;
@@ -462,7 +516,7 @@ class Person {
     const frame_i = this.start_i + curr_frame;
 
     this.map.offset.x = frame_i / this.frame_num;
-
+    this.bloom_map.offset.x = frame_i / this.frame_num;
 
     if (this.walking) {
       // get a unit vector in the direction from our current point to 
@@ -492,7 +546,7 @@ class Person {
     }
     
     // update threejs Object3D position with our internal tracker
-    this.plane.position.copy(this.position);
+    this.group.position.copy(this.position);
 
   }
 }
@@ -641,7 +695,8 @@ function renderFrame(now) {
   then = now;
 
 
-  greta.update()
+  greta.update();
+  keeper.update();
 
   cameraFollow(camera, greta.position);
 
@@ -656,8 +711,8 @@ function renderFrame(now) {
   requestAnimationFrame(renderFrame);
 }
 
-//var char;
 var greta;
+var keeper;
 var testlamp;
 function main() {
 
@@ -683,8 +738,16 @@ function main() {
 
 
   // add greta
-  greta = new Person(spr_sheet, spr_meta, scene);
+  greta = new Person('greta', greta_sheet, greta_meta, 
+			      greta_bloom_sheet, greta_bloom_meta, 
+			      scene);
   greta.teleport(new Vector3(0, 0, 6));
+
+  // add keeper
+  keeper = new Person('keeper', keeper_sheet, keeper_meta, 
+				keeper_bloom_sheet, keeper_bloom_meta, 
+				scene);
+  keeper.teleport(new Vector3(2, 0, 4));
 
 
   // put some lamps in the scene
@@ -700,7 +763,7 @@ function main() {
   position = new Vector3(5, 5, -28);
   lamp = new Lamp(position, scene);
 
-  const testposition = new Vector3(2, 5, 2);
+  const testposition = new Vector3(2, 5, 9);
   testlamp = new Lamp(testposition, scene);
   makeGUILamp(gui, testlamp, 'test lamp');
   console.log(testlamp);

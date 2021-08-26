@@ -1,9 +1,32 @@
 
-next: text
+next: keeper's eyes should blink more normally
 
-have to add durational feature to displayNarratorText()
+so at this point i should just have variable frame durations
+
+oof this is gonna be a whole thing. whatever. i want it i need it i gotta have it superfast
 
 
+milestone: get it online
+
+milestone laters:
+- un-tile the floor
+- populate with trees
+- keeper/guardian/steward you can talk to
+hello
+hello
+
+there will be more stuff eventually
+
+he /needs/ bloom on his eyes
+and make him blink them
+- get a domain name
+- get it onto the dropleet
+- feature parity on mobile
+- MULTIPLAYER
+
+
+============ MILESTONE LINE ==========
+(everything below this line is unnecessary for milestone
 
 later:
 - dialog/text (look at some threejsfundamentals articles including this one https://threejsfundamentals.org/threejs/lessons/threejs-align-html-elements-to-3d.html )
@@ -22,6 +45,29 @@ VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/14178606438902
 - maybe can play with 'exposure' to simulate your eyes adjusting to the dark (like when the player is close to the fire, everything else is dark). this seems like a very helpful example: https://threejs.org/examples/#webgl_lights_physical
 - populate the landscape with some trees
 - write some wrapper code around GUI to make it quick to set up controls for arbitrary params
+- make the sprite to person toolchain cleaner (so you don't have to import a base sheet and a bloom sheet)
+- problem: things take a while to load up front
+
+# 8/23
+
+oop i forgor to push changes from my desktop. not a huge deal
+
+i'm still working towards just getting it online
+
+ok instead of redoing that work with the narrative text refactoring, i'm going to hackily make the narrative text go away
+
+i'm going to add the keeper and bloom their eyes
+
+o maybe i should make a new plane on new layer
+and give this plane a basic material (not a light-affected material)
+and also make the blue a little lighter?
+
+ok we're adding a new layer to our person..
+
+first let's try the method where we manually add a bloom layer
+then let's try to automate it
+i'll automate it later
+
 
 # 8/11
 
