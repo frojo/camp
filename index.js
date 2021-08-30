@@ -9,6 +9,9 @@ import keeper_meta from "./assets/steward.json";
 import keeper_bloom_sheet from "./assets/steward_bloom.png";
 import keeper_bloom_meta from "./assets/steward_bloom.json";
 
+import newkeeper_sheet from "./assets/new_steward.png";
+import newkeeper_meta from "./assets/new_steward.json";
+
 import ground_tex from "./assets/ground.png";
 
 import { Scene, 
@@ -367,16 +370,26 @@ class Lamp {
 class Person {
   // our papermario/magicwand pixelart person class
   //
+  // each Person has a corresponding sprite sheet with two layers:
+  // a base layer and a bloom layer
+  // the bloom layer has the bloom effect applied to it
+  //
   // the spritesheet is a horizontal row of sprites
+  // the first half of the sheet is frames for the base layer,
+  // the second half is frames for the bloom layer
   //
   // must have an idle animation that is tagged as such
   //
-  // and it comes with a json file that has info on where the animations
-  // start and end etc.
+  // each sprite sheet has an accompanying json file that has meta 
+  // info on where the animations start and end etc.
+  //
   // the JSON has to be exported by aseprite with certain export settings
   // which are mostly defaults except for:
+  // Layers: Visible Layers
+  // Frames: All frames
+  // Split Layers checked (split tags not checked)
   // Array (not Hash)
-  // set "Item Filename" to {tag}{tagframe}
+  // set "Item Filename" to {tag}{tagframe}_{layer}
   //
   // <name> is a string of our person's name (e.g. 'greta')
   // <sheet_path> is a path to a spritesheet .png
@@ -395,6 +408,9 @@ class Person {
 
     // how many frames in the sprite sheet
     this.frame_num = this.meta.frames.length;
+    this.frames_per_layer = this.meta.frames.length / 2;
+
+    // BASE LAYER
 
     // create geometry/textures and add to threejs scene
     const map = new TextureLoader().load(sheet_path);
@@ -416,7 +432,9 @@ class Person {
     // BLOOM LAYER
 
     // create geometry/textures and add to threejs scene
-    const bloom_map = new TextureLoader().load(bloom_sheet_path);
+    // OLD
+    // const bloom_map = new TextureLoader().load(bloom_sheet_path);
+    const bloom_map = new TextureLoader().load(sheet_path);
     // get those crisp pixels
     bloom_map.magFilter = NearestFilter
     // sample one frame at a time from the sprite sheet
@@ -459,6 +477,7 @@ class Person {
     console.log('starting ' + anim + ' anim for ' + this.name);
     let tags = this.meta.meta.frameTags;
     console.log(this.meta);
+    this.curr_anim = anim;
 
 
     const anim_info = tags.find(function(value) {
@@ -516,26 +535,26 @@ class Person {
     // there's probably a saner way of doing this
     const split = t_ms % this.anim_total_dur;
     let interval_ms = 0;
-    let curr_frame = 0;
-    for (curr_frame = this.start_i; curr_frame < this.end_i + 1; 
-	 curr_frame++)  {
-      interval_ms += this.meta.frames[curr_frame].duration;
+    let frame_i = 0;
+    for (frame_i = this.start_i; frame_i < this.end_i + 1; 
+	 frame_i++)  {
+      interval_ms += this.meta.frames[frame_i].duration;
       if (split < interval_ms) {
 	break;
       }
     }
-    if (this.name == 'keeper') {
+    if (false && this.name == 'greta' && this.curr_anim == 'walk') {
       console.log('anim total dur = ' + this.anim_total_dur);
       console.log('time_ms = ' + t_ms);
       console.log('split = ' + split);
 
-      console.log('curr_frame = ' + curr_frame);
+      console.log('frame_i = ' + frame_i);
     }
 
-    const frame_i = this.start_i + curr_frame;
-
     this.map.offset.x = frame_i / this.frame_num;
-    this.bloom_map.offset.x = frame_i / this.frame_num;
+
+    const bloom_frame_i = frame_i + this.frames_per_layer;
+    this.bloom_map.offset.x = bloom_frame_i / this.frame_num;
 
     if (this.walking) {
       // get a unit vector in the direction from our current point to 
@@ -693,6 +712,7 @@ function renderFrame(now) {
 
   greta.update();
   keeper.update();
+  newkeeper.update();
 
   cameraFollow(camera, greta.position);
 
@@ -709,6 +729,7 @@ function renderFrame(now) {
 
 var greta;
 var keeper;
+var newkeeper;
 var testlamp;
 function main() {
 
@@ -744,6 +765,12 @@ function main() {
 				keeper_bloom_sheet, keeper_bloom_meta, 
 				scene);
   keeper.teleport(new Vector3(2, 0, 4));
+
+  // add keeper
+  newkeeper = new Person('newkeeper', newkeeper_sheet, newkeeper_meta, 
+				null, null, 
+				scene);
+  newkeeper.teleport(new Vector3(1, 0, 4));
 
 
   // put some lamps in the scene
