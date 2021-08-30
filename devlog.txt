@@ -5,6 +5,12 @@ so at this point i should just have variable frame durations
 
 oof this is gonna be a whole thing. whatever. i want it i need it i gotta have it superfast
 
+problem: if i change a frame duration, i have manually re export the sprite sheet for both bloom and base. manually exporting is annoying, time-consuming and prone to error
+
+still todo:
+debug greta's walking anim
+tune blinking on keeper to make it feel right
+
 
 
 milestone: get it online

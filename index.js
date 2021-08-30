@@ -475,11 +475,15 @@ class Person {
     this.start_i = anim_info.from;
     this.end_i = anim_info.to;
 
+
     // calculate total duration for this animation
     // (we need this for animating)
-    //
-    this.meta.frames
-    //this.anim_total_dur = something;
+    let total_dur_ms = 0;
+    for (let i = this.start_i; i < this.end_i + 1; i++)  {
+      total_dur_ms += this.meta.frames[i].duration;
+    }
+    this.anim_total_dur = total_dur_ms;
+    console.log(this.anim_total_dur);
   }
 
   // <target> is Vector3 world coords on the ground plane 
@@ -506,13 +510,28 @@ class Person {
   update() {
     // determine which frame we're on
     const t_ms = Date.now();
-    const num_frames = this.end_i - this.start_i + 1;
-    // const total_dur = soemthing;
 
-    // assume for now that every frame lasts for 200ms
-    const frame_dur = 200;
 
-    const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
+    // this little loop figures out the current frame we're on
+    // there's probably a saner way of doing this
+    const split = t_ms % this.anim_total_dur;
+    let interval_ms = 0;
+    let curr_frame = 0;
+    for (curr_frame = this.start_i; curr_frame < this.end_i + 1; 
+	 curr_frame++)  {
+      interval_ms += this.meta.frames[curr_frame].duration;
+      if (split < interval_ms) {
+	break;
+      }
+    }
+    if (this.name == 'keeper') {
+      console.log('anim total dur = ' + this.anim_total_dur);
+      console.log('time_ms = ' + t_ms);
+      console.log('split = ' + split);
+
+      console.log('curr_frame = ' + curr_frame);
+    }
+
     const frame_i = this.start_i + curr_frame;
 
     this.map.offset.x = frame_i / this.frame_num;
