@@ -1,16 +1,9 @@
 
 import greta_sheet from "./assets/char.png";
 import greta_meta from "./assets/char.json";
-import greta_bloom_sheet from "./assets/char_bloom.png";
-import greta_bloom_meta from "./assets/char_bloom.json";
 
 import keeper_sheet from "./assets/steward.png";
 import keeper_meta from "./assets/steward.json";
-import keeper_bloom_sheet from "./assets/steward_bloom.png";
-import keeper_bloom_meta from "./assets/steward_bloom.json";
-
-import newkeeper_sheet from "./assets/new_steward.png";
-import newkeeper_meta from "./assets/new_steward.json";
 
 import ground_tex from "./assets/ground.png";
 
@@ -395,8 +388,7 @@ class Person {
   // <sheet_path> is a path to a spritesheet .png
   // <meta> is a object derived from the JSON produced by aseprite
   // <scene> is a reference to threejs scene
-  constructor(name, sheet_path, meta, 
-		    bloom_sheet_path, bloom_meta, scene) {
+  constructor(name, sheet_path, meta, scene) {
     this.name = name;
     this.sheet_path = sheet_path;
     this.meta = meta;
@@ -408,7 +400,6 @@ class Person {
 
     // how many frames in the sprite sheet
     this.frame_num = this.meta.frames.length;
-    this.frames_per_layer = this.meta.frames.length / 2;
 
     // BASE LAYER
 
@@ -432,8 +423,6 @@ class Person {
     // BLOOM LAYER
 
     // create geometry/textures and add to threejs scene
-    // OLD
-    // const bloom_map = new TextureLoader().load(bloom_sheet_path);
     const bloom_map = new TextureLoader().load(sheet_path);
     // get those crisp pixels
     bloom_map.magFilter = NearestFilter
@@ -543,17 +532,10 @@ class Person {
 	break;
       }
     }
-    if (false && this.name == 'greta' && this.curr_anim == 'walk') {
-      console.log('anim total dur = ' + this.anim_total_dur);
-      console.log('time_ms = ' + t_ms);
-      console.log('split = ' + split);
-
-      console.log('frame_i = ' + frame_i);
-    }
 
     this.map.offset.x = frame_i / this.frame_num;
 
-    const bloom_frame_i = frame_i + this.frames_per_layer;
+    const bloom_frame_i = frame_i + (this.frame_num / 2);
     this.bloom_map.offset.x = bloom_frame_i / this.frame_num;
 
     if (this.walking) {
@@ -712,7 +694,6 @@ function renderFrame(now) {
 
   greta.update();
   keeper.update();
-  newkeeper.update();
 
   cameraFollow(camera, greta.position);
 
@@ -729,7 +710,6 @@ function renderFrame(now) {
 
 var greta;
 var keeper;
-var newkeeper;
 var testlamp;
 function main() {
 
@@ -755,22 +735,12 @@ function main() {
 
 
   // add greta
-  greta = new Person('greta', greta_sheet, greta_meta, 
-			      greta_bloom_sheet, greta_bloom_meta, 
-			      scene);
+  greta = new Person('greta', greta_sheet, greta_meta, scene);
   greta.teleport(new Vector3(0, 0, 6));
 
   // add keeper
-  keeper = new Person('keeper', keeper_sheet, keeper_meta, 
-				keeper_bloom_sheet, keeper_bloom_meta, 
-				scene);
+  keeper = new Person('keeper', keeper_sheet, keeper_meta, scene);
   keeper.teleport(new Vector3(2, 0, 4));
-
-  // add keeper
-  newkeeper = new Person('newkeeper', newkeeper_sheet, newkeeper_meta, 
-				null, null, 
-				scene);
-  newkeeper.teleport(new Vector3(1, 0, 4));
 
 
   // put some lamps in the scene

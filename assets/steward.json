@@ -1,6 +1,6 @@
 { "frames": [
    {
-    "filename": "idle{tagrame}",
+    "filename": "idle0_base",
     "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -9,8 +9,26 @@
     "duration": 7000
    },
    {
-    "filename": "idle{tagrame}",
+    "filename": "idle1_base",
     "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 150
+   },
+   {
+    "filename": "idle0_bloom",
+    "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 7000
+   },
+   {
+    "filename": "idle1_bloom",
+    "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
@@ -23,13 +41,14 @@
   "version": "1.2.27",
   "image": "steward.png",
   "format": "RGBA8888",
-  "size": { "w": 64, "h": 32 },
+  "size": { "w": 128, "h": 32 },
   "scale": "1",
   "frameTags": [
    { "name": "idle", "from": 0, "to": 1, "direction": "forward" }
   ],
   "layers": [
-   { "name": "base", "opacity": 255, "blendMode": "normal" }
+   { "name": "base", "opacity": 255, "blendMode": "normal" },
+   { "name": "bloom", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]

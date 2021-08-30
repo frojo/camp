@@ -1,6 +1,6 @@
 { "frames": [
    {
-    "filename": "idle{tagrame}",
+    "filename": "idle0_base",
     "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -9,7 +9,7 @@
     "duration": 1000
    },
    {
-    "filename": "idle{tagrame}",
+    "filename": "idle1_base",
     "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -18,7 +18,7 @@
     "duration": 1000
    },
    {
-    "filename": "walk{tagrame}",
+    "filename": "walk0_base",
     "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -27,7 +27,7 @@
     "duration": 150
    },
    {
-    "filename": "walk{tagrame}",
+    "filename": "walk1_base",
     "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
@@ -36,8 +36,53 @@
     "duration": 150
    },
    {
-    "filename": "walk{tagrame}",
+    "filename": "walk2_base",
     "frame": { "x": 128, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 150
+   },
+   {
+    "filename": "idle0_bloom",
+    "frame": { "x": 160, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 1000
+   },
+   {
+    "filename": "idle1_bloom",
+    "frame": { "x": 192, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 1000
+   },
+   {
+    "filename": "walk0_bloom",
+    "frame": { "x": 224, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 150
+   },
+   {
+    "filename": "walk1_bloom",
+    "frame": { "x": 256, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 150
+   },
+   {
+    "filename": "walk2_bloom",
+    "frame": { "x": 288, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
@@ -50,14 +95,15 @@
   "version": "1.2.27",
   "image": "char.png",
   "format": "RGBA8888",
-  "size": { "w": 160, "h": 32 },
+  "size": { "w": 320, "h": 32 },
   "scale": "1",
   "frameTags": [
    { "name": "idle", "from": 0, "to": 1, "direction": "forward" },
    { "name": "walk", "from": 2, "to": 4, "direction": "forward" }
   ],
   "layers": [
-   { "name": "base", "opacity": 255, "blendMode": "normal" }
+   { "name": "base", "opacity": 255, "blendMode": "normal" },
+   { "name": "bloom", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]
