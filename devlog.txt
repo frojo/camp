@@ -1,10 +1,6 @@
 
 next: keeper's eyes should blink more normally
 
-so at this point i should just have variable frame durations
-
-oof this is gonna be a whole thing. whatever. i want it i need it i gotta have it superfast
-
 
 milestone: get it online
 
@@ -47,6 +43,51 @@ VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/14178606438902
 - write some wrapper code around GUI to make it quick to set up controls for arbitrary params
 - make the sprite to person toolchain cleaner (so you don't have to import a base sheet and a bloom sheet)
 - problem: things take a while to load up front
+
+
+# 8/30
+
+still todo:
+debug greta's walking anim
+tune blinking on keeper to make it feel right
+
+problem: if i change a frame duration, i have manually re export the sprite sheet for both bloom and base. manually exporting is annoying, time-consuming and prone to error
+
+
+..... do i want to try to tackle this now?? yeah let's see what it would involve
+
+ok: let's say that every character has two layers, a base layer and a bloomed layer. so in aseprite, we have two layers that correspond to these
+
+can we even get layer information in the meta info?
+
+o yeah aseprite can split out the layers for us
+
+o i think i'd need to add more layer meta info to the "item filename"
+
+lets see how it exports first
+
+ok so there is some layer info at .meta.layers
+
+ok i will acknowledge that i'm not super sure this work is worth it, but it's just already getting kind of painful? i'm just gonna do it real quick
+
+ok since it's all in the same sprite sheet, we would have to use the same sheet in both maps. hiwch is chill. i guess we jsut have to index it differently
+
+hm it doesn' tlook like that layers meta array has info on like the indices of the sprites in the spirtesheet
+
+but i mean, okay we know that we're only gonna have 2 layers, base and bloom
+
+the bloom frames will always be the same length etc. of the base ones, just offset by the total number of frames in the spritesheet for one layer, which will also always be half of the total number of frames
+
+do we need two Maps? or can the plane meshes share a map??..
+
+oo i think it works and it wasn't that much work
+
+
+todo: can we use the same map?
+no. we can't
+
+ok yay we did a refactor
+
 
 # 8/23
 

@@ -1,13 +1,9 @@
 
 import greta_sheet from "./assets/char.png";
 import greta_meta from "./assets/char.json";
-import greta_bloom_sheet from "./assets/char_bloom.png";
-import greta_bloom_meta from "./assets/char_bloom.json";
 
 import keeper_sheet from "./assets/steward.png";
 import keeper_meta from "./assets/steward.json";
-import keeper_bloom_sheet from "./assets/steward_bloom.png";
-import keeper_bloom_meta from "./assets/steward_bloom.json";
 
 import ground_tex from "./assets/ground.png";
 
@@ -367,23 +363,32 @@ class Lamp {
 class Person {
   // our papermario/magicwand pixelart person class
   //
+  // each Person has a corresponding sprite sheet with two layers:
+  // a base layer and a bloom layer
+  // the bloom layer has the bloom effect applied to it
+  //
   // the spritesheet is a horizontal row of sprites
+  // the first half of the sheet is frames for the base layer,
+  // the second half is frames for the bloom layer
   //
   // must have an idle animation that is tagged as such
   //
-  // and it comes with a json file that has info on where the animations
-  // start and end etc.
+  // each sprite sheet has an accompanying json file that has meta 
+  // info on where the animations start and end etc.
+  //
   // the JSON has to be exported by aseprite with certain export settings
   // which are mostly defaults except for:
+  // Layers: Visible Layers
+  // Frames: All frames
+  // Split Layers checked (split tags not checked)
   // Array (not Hash)
-  // set "Item Filename" to {tag}{tagframe}
+  // set "Item Filename" to {tag}{tagframe}_{layer}
   //
   // <name> is a string of our person's name (e.g. 'greta')
   // <sheet_path> is a path to a spritesheet .png
   // <meta> is a object derived from the JSON produced by aseprite
   // <scene> is a reference to threejs scene
-  constructor(name, sheet_path, meta, 
-		    bloom_sheet_path, bloom_meta, scene) {
+  constructor(name, sheet_path, meta, scene) {
     this.name = name;
     this.sheet_path = sheet_path;
     this.meta = meta;
@@ -395,6 +400,8 @@ class Person {
 
     // how many frames in the sprite sheet
     this.frame_num = this.meta.frames.length;
+
+    // BASE LAYER
 
     // create geometry/textures and add to threejs scene
     const map = new TextureLoader().load(sheet_path);
@@ -416,7 +423,7 @@ class Person {
     // BLOOM LAYER
 
     // create geometry/textures and add to threejs scene
-    const bloom_map = new TextureLoader().load(bloom_sheet_path);
+    const bloom_map = new TextureLoader().load(sheet_path);
     // get those crisp pixels
     bloom_map.magFilter = NearestFilter
     // sample one frame at a time from the sprite sheet
@@ -459,6 +466,7 @@ class Person {
     console.log('starting ' + anim + ' anim for ' + this.name);
     let tags = this.meta.meta.frameTags;
     console.log(this.meta);
+    this.curr_anim = anim;
 
 
     const anim_info = tags.find(function(value) {
@@ -475,11 +483,15 @@ class Person {
     this.start_i = anim_info.from;
     this.end_i = anim_info.to;
 
+
     // calculate total duration for this animation
     // (we need this for animating)
-    //
-    this.meta.frames
-    //this.anim_total_dur = something;
+    let total_dur_ms = 0;
+    for (let i = this.start_i; i < this.end_i + 1; i++)  {
+      total_dur_ms += this.meta.frames[i].duration;
+    }
+    this.anim_total_dur = total_dur_ms;
+    console.log(this.anim_total_dur);
   }
 
   // <target> is Vector3 world coords on the ground plane 
@@ -506,17 +518,25 @@ class Person {
   update() {
     // determine which frame we're on
     const t_ms = Date.now();
-    const num_frames = this.end_i - this.start_i + 1;
-    // const total_dur = soemthing;
 
-    // assume for now that every frame lasts for 200ms
-    const frame_dur = 200;
 
-    const curr_frame = Math.floor(t_ms / frame_dur) % (num_frames);
-    const frame_i = this.start_i + curr_frame;
+    // this little loop figures out the current frame we're on
+    // there's probably a saner way of doing this
+    const split = t_ms % this.anim_total_dur;
+    let interval_ms = 0;
+    let frame_i = 0;
+    for (frame_i = this.start_i; frame_i < this.end_i + 1; 
+	 frame_i++)  {
+      interval_ms += this.meta.frames[frame_i].duration;
+      if (split < interval_ms) {
+	break;
+      }
+    }
 
     this.map.offset.x = frame_i / this.frame_num;
-    this.bloom_map.offset.x = frame_i / this.frame_num;
+
+    const bloom_frame_i = frame_i + (this.frame_num / 2);
+    this.bloom_map.offset.x = bloom_frame_i / this.frame_num;
 
     if (this.walking) {
       // get a unit vector in the direction from our current point to 
@@ -738,15 +758,11 @@ function main() {
 
 
   // add greta
-  greta = new Person('greta', greta_sheet, greta_meta, 
-			      greta_bloom_sheet, greta_bloom_meta, 
-			      scene);
+  greta = new Person('greta', greta_sheet, greta_meta, scene);
   greta.teleport(new Vector3(0, 0, 6));
 
   // add keeper
-  keeper = new Person('keeper', keeper_sheet, keeper_meta, 
-				keeper_bloom_sheet, keeper_bloom_meta, 
-				scene);
+  keeper = new Person('keeper', keeper_sheet, keeper_meta, scene);
   keeper.teleport(new Vector3(2, 0, 4));
 
 
