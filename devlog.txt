@@ -450,3 +450,11 @@ i got the plane to be transparent, which is sick. next i should animate the walk
 
 this project has a lot of conceptual (and aesthetic) similarities to one of the possible directions i could take this in http://www.noio.nl/2019/01/garbage-country-logbook/logbook
 
+
+
+============ VISUALS ====================
+
+look at these cool ass filters from the pixiJS library
+https://filters.pixijs.download/main/demo/index.html
+
+ASCII, RBG Shift, CRT (sort oft), reflection? Glitch, 
