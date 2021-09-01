@@ -1,5 +1,5 @@
 
-next: keeper's eyes should blink more normally
+next: get github to work with desktop
 
 
 milestone: get it online
@@ -444,4 +444,9 @@ i got the plane to be transparent, which is sick. next i should animate the walk
 
 <p>yeah looks like three.js is the ticket. going to try to do what i want to do with threejs now. i'm a little worried that it wont let me do weird shader stuff... but im sure it has support for that right?</p>
 
+
+
+================== CONCEPTUAL NOTES =============
+
+this project has a lot of conceptual (and aesthetic) similarities to one of the possible directions i could take this in http://www.noio.nl/2019/01/garbage-country-logbook/logbook
 
