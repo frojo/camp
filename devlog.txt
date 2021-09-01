@@ -1,5 +1,5 @@
 
-next: keeper's eyes should blink more normally
+next: get github to work with desktop
 
 
 milestone: get it online
@@ -130,6 +130,21 @@ also if i set the max-width to 100%, there's no longer a background color??
 oh wait so it's setting the width to the size of the biggest word...
 if i set max-width to 100%, that makes the width 0
 
+
+# 8/13
+
+i'm realizing now that what i want is to get this online asap
+and so i want to get it into a state where it's somewhat presentable
+but i want to do the least amount of work to get it there
+and then i can add more stuff/content after it's up
+
+i think right now it's actually ok as a playtestable thing
+but for people to "get it" it needs:
+-trees
+-the ground to not be tiled/be a noticeable pattern
+-some better lighting so you can see the character
+
+but for today i'll work on the narrator text so that it's easier to use it, and so that it fades after some time
 
 # 8/10
 
@@ -431,3 +446,16 @@ i got the plane to be transparent, which is sick. next i should animate the walk
 <p>yeah looks like three.js is the ticket. going to try to do what i want to do with threejs now. i'm a little worried that it wont let me do weird shader stuff... but im sure it has support for that right?</p>
 
 
+
+================== CONCEPTUAL NOTES =============
+
+this project has a lot of conceptual (and aesthetic) similarities to one of the possible directions i could take this in http://www.noio.nl/2019/01/garbage-country-logbook/logbook
+
+
+
+============ VISUALS ====================
+
+look at these cool ass filters from the pixiJS library
+https://filters.pixijs.download/main/demo/index.html
+
+ASCII, RBG Shift, CRT (sort oft), reflection? Glitch, 
