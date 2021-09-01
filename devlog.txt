@@ -1,22 +1,17 @@
 
-next: get github to work with desktop
+next: un-tile the floor
 
 
 milestone: get it online
 
 milestone laters:
-- un-tile the floor
 - populate with trees
 - keeper/guardian/steward you can talk to
 hello
-hello
+hi
 
 there will be more stuff eventually
 
-he /needs/ bloom on his eyes
-and make him blink them
-- get a domain name
-afterli.fe
 - get it onto the dropleet
 - feature parity on mobile
 - MULTIPLAYER
@@ -44,7 +39,98 @@ VCR/CRT effect like from https://twitter.com/puppet_sunsun/status/14178606438902
 - write some wrapper code around GUI to make it quick to set up controls for arbitrary params
 - make the sprite to person toolchain cleaner (so you don't have to import a base sheet and a bloom sheet)
 - problem: things take a while to load up front
+- bug: why do keeper's eyes not bloom as much sometimes? shouldn't their material not be affected by light
 
+============ DAILY LOG ================
+
+# 9/1
+
+solved the github annoying thing for my desktop this morning ugh. had to install homebrew which ended up being a whole hting
+
+next: keeper's eyes should always bloom the same regardless of light
+
+is it the ambient light?? no
+
+for some reason it's unnafected by the spot light placements, but it is affected by greta walking in front of it
+
+i don't feel like debugging this now i'm oging to shelve it
+
+domain name brainstorming
+
+o what is this https://zkga.me
+
+it's liek a crypto mmorgp. seems lame... 
+
+but not as lame as this https://twitter.com/aavegotchi
+
+makes me want to make thouagotchi
+
+
+afterli.fe | no .fe but there is after.life
+
+oh wow after.life is already a website
+
+
+purgato.ry | 
+lim.bo
+
+
+
+good TLDs
+.land
+.zone
+.living
+.link
+.rip
+.space
+.spot
+.world
+.net
+.fait
+.eco
+.day
+.city
+
+nowhere.land
+limbo.land
+
+cryptic
+secret
+mystic
+
+dark forest
+outside
+cement slab
+
+https://pioneerworks.org/broadcast/i-know-a-place-pipkin is ripe with inspiriation
+
+abandoned
+forgotten
+lush
+nightmare
+
+forgotten.city
+
+hidden.city
+
+latent.city
+shrouded
+veiled
+
+crypt.city
+
+strange.land
+
+cave.city
+cave.land
+
+
+i'm drawn to latent.city
+it's mysterious and sort of gets at what the game is about, but also is meaningless in a way
+
+and it's mine
+
+it feels like a tad bit pretentious but.... idk man
 
 # 8/30
 

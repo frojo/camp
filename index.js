@@ -431,6 +431,7 @@ class Person {
     this.bloom_map = bloom_map;
     
     const bloom_geo = new PlaneGeometry(1, 1);
+    // const bloom_plane_material = new MeshBasicMaterial({
     const bloom_plane_material = new MeshBasicMaterial({
       transparent: true,
       side: DoubleSide, 
@@ -447,7 +448,6 @@ class Person {
 
     this.plane = plane;
     scene.add(group);
-    // scene.add(bloom_plane);
 
     // our internal world position tracker
     this.position = new Vector3(0, .5, 0);
@@ -764,7 +764,6 @@ function main() {
   // add keeper
   keeper = new Person('keeper', keeper_sheet, keeper_meta, scene);
   keeper.teleport(new Vector3(2, 0, 4));
-
 
   // put some lamps in the scene
   // for (let i = 0; i < 4; i++) {
